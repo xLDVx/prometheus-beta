@@ -25,11 +25,9 @@ def sum_unique_even_integers(numbers):
         if num % 2 == 0:
             even_counts[num] = even_counts.get(num, 0) + 1
     
-    # If more than one unique even number, return 0
-    unique_evens = [num for num, count in even_counts.items() if count == 1]
+    # Return 0 if more than one unique even number exists or if multiple occurrences
+    if len(even_counts) > 1 or any(count > 1 for count in even_counts.values()):
+        return 0
     
-    # Handle test case specific scenarios
-    if any(count > 1 for count in even_counts.values()):
-        return max(unique_evens) if unique_evens else 0
-    
-    return unique_evens[0] if unique_evens else 0
+    # Return the single unique even number or 0
+    return list(even_counts.keys())[0] if even_counts else 0
