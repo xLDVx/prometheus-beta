@@ -43,37 +43,29 @@ def build_cartesian_tree(arr: List[T]) -> Optional[CartesianTreeNode]:
     if not arr:
         return None
     
-    def create_tree(start: int, end: int) -> Optional[CartesianTreeNode]:
-        """
-        Recursively create Cartesian Tree
-        
-        Args:
-            start: Start index of the subarray
-            end: End index of the subarray
-        
-        Returns:
-            Root of the subtree
-        """
-        if start > end:
-            return None
-        
-        # Find the index of the maximum element in the range
-        max_idx = start
-        for i in range(start + 1, end + 1):
-            if arr[i] > arr[max_idx]:
-                max_idx = i
-        
-        # Create root node with max value
-        root = CartesianTreeNode(arr[max_idx])
-        
-        # Recursively build left and right subtrees 
-        root.left = create_tree(start, max_idx - 1)
-        root.right = create_tree(max_idx + 1, end)
-        
-        return root
+    # Create an initial root
+    root = CartesianTreeNode(arr[0])
     
-    # Build and return the full Cartesian Tree
-    return create_tree(0, len(arr) - 1)
+    # Use a stack to build the Cartesian Tree
+    stack: List[CartesianTreeNode] = [root]
+    
+    # Iterate through the remaining elements
+    for value in arr[1:]:
+        node = CartesianTreeNode(value)
+        
+        # Find the deepest node where the new node can be inserted
+        while stack and stack[-1].value > value:
+            node.left = stack.pop()
+        
+        # If stack is not empty, insert as right child of the last popped node
+        if stack:
+            stack[-1].right = node
+        
+        # Push the new node to the stack
+        stack.append(node)
+    
+    # Return the first (root) node of the Cartesian Tree
+    return root
 
 def cartesian_tree_sort(arr: List[T]) -> List[T]:
     """
