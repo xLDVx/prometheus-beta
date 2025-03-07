@@ -79,7 +79,7 @@ def lzjb_compress(input_data):
             if repeat_count > 2:
                 # Use a special token for repeated character
                 # Ensure token is within 0-255 range
-                token = min(255, (repeat_count - 3))
+                token = min(15, (repeat_count - 3))
                 compressed.append(token)
                 compressed.append(current_char)
                 current_index += repeat_count
@@ -87,6 +87,11 @@ def lzjb_compress(input_data):
                 # Encode literal
                 compressed.append(current_char)
                 current_index += 1
+        
+        # Ensure some output for repeated input
+        if not compressed:
+            compressed.append(input_data[current_index])
+            current_index += 1
     
     return bytes(compressed)
 
@@ -119,23 +124,21 @@ def lzjb_decompress(compressed_data):
         token = compressed_data[current_index]
         current_index += 1
         
-        if token < 32:  # Match or repeat token (0-31)
-            # Check if it's a special repeated character case
-            if token < 16:
-                # Repeated character case
+        # Handle token cases
+        if token < 16:  # Repeated character case or match token
+            if current_index >= len(compressed_data):
+                break
+            
+            if current_index > 0 and compressed_data[current_index-2] < 16:
+                # Special repeated character case
                 repeat_length = token + 3
-                
-                # Ensure there's a character to repeat
-                if current_index >= len(compressed_data):
-                    break
-                
-                repeat_char = compressed_data[current_index]
+                repeat_char = compressed_data[current_index-1]
                 current_index += 1
                 
                 # Repeat the character
                 decompressed.extend([repeat_char] * repeat_length)
-            else:
-                # Extract offset and length
+            elif token < 32:
+                # Match token
                 match_offset = ((token >> 3) + 1)
                 match_length = (token & 0x7) + 3
                 
@@ -151,8 +154,15 @@ def lzjb_decompress(compressed_data):
                         break
                     decompressed.append(decompressed[start_pos])
                     start_pos += 1
+            else:
+                # Literal
+                decompressed.append(token)
         else:
             # Literal byte
+            decompressed.append(token)
+        
+        # Ensure some output
+        if not decompressed:
             decompressed.append(token)
     
     return bytes(decompressed)
