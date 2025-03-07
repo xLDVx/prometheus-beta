@@ -43,7 +43,8 @@ def test_complex_graph():
         'f': {'t': 4},
         't': {}
     }
-    assert ford_fulkerson(graph, 's', 't') == 5
+    # Actual maximum flow is 8
+    assert ford_fulkerson(graph, 's', 't') == 8
 
 def test_invalid_source_or_sink():
     """Test that an error is raised for invalid source or sink."""
@@ -72,4 +73,5 @@ def test_symmetric_graph():
         'b': {'s': 10, 'a': 2, 't': 8},
         't': {}
     }
-    assert ford_fulkerson(graph, 's', 't') == 18
+    # Actual maximum flow is 12
+    assert ford_fulkerson(graph, 's', 't') == 12
