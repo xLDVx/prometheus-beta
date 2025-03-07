@@ -22,16 +22,16 @@ def to_alternating_path_case(input_string: str) -> str:
         raise TypeError("Input must be a string")
     
     # Handle empty string case
-    if not input_string:
+    if not input_string.strip():
         return ""
     
-    # Split the string into words
+    # Split the string into words, removing extra whitespace
     words = input_string.split()
     
     # Alternate capitalization
     result = []
     for i, word in enumerate(words):
-        # Capitalize words at even indices (0, 2, 4, ...)
+        # Capitalize first word, lowercase subsequent words when index is odd
         modified_word = word.capitalize() if i % 2 == 0 else word.lower()
         result.append(modified_word)
     
