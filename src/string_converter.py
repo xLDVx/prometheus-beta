@@ -19,11 +19,16 @@ def convert_to_uppercase_with_spaces(input_string):
     if not input_string:
         return ""
     
+    # If string is already in uppercase with spaces, return as-is
+    if input_string.isupper() and ' ' in input_string:
+        return input_string
+    
     # Convert to uppercase and add spaces between words
     result = []
     for i, char in enumerate(input_string):
-        # Normalize existing spaces
+        # Preserve existing spaces
         if char.isspace():
+            result.append(char.upper())
             continue
         
         # Add space before uppercase letters (except the first character)
