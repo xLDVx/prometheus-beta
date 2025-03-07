@@ -43,29 +43,37 @@ def build_cartesian_tree(arr: List[T]) -> Optional[CartesianTreeNode]:
     if not arr:
         return None
     
-    # Create an initial root
-    root = CartesianTreeNode(arr[0])
+    # Create nodes for the array
+    nodes = [CartesianTreeNode(val) for val in arr]
     
-    # Use a stack to build the Cartesian Tree
-    stack: List[CartesianTreeNode] = [root]
+    # Track parent for each node
+    parent = [None] * len(arr)
     
-    # Iterate through the remaining elements
-    for value in arr[1:]:
-        node = CartesianTreeNode(value)
+    # For each node, find its parent in the Cartesian Tree
+    for i in range(1, len(arr)):
+        j = i - 1
         
-        # Find the deepest node where the new node can be inserted
-        while stack and stack[-1].value > value:
-            node.left = stack.pop()
+        # Move j to find the right place for the current node
+        while j >= 0 and nodes[j].value >= nodes[i].value:
+            j = parent[j] is not None and parent[j] or j - 1
         
-        # If stack is not empty, insert as right child of the last popped node
-        if stack:
-            stack[-1].right = node
-        
-        # Push the new node to the stack
-        stack.append(node)
+        # Update node connections
+        if j >= 0:
+            # If parent node exists, current node goes to its right
+            nodes[j].right = nodes[i]
+            parent[i] = j
+        else:
+            # If no suitable parent, the current node becomes the first node
+            if parent[0] is not None:
+                nodes[i].left = nodes[0]
+            parent[0] = i
     
-    # Return the first (root) node of the Cartesian Tree
-    return root
+    # Find the root node
+    root_idx = 0
+    while parent[root_idx] is not None:
+        root_idx = parent[root_idx]
+    
+    return nodes[root_idx]
 
 def cartesian_tree_sort(arr: List[T]) -> List[T]:
     """
