@@ -26,10 +26,6 @@ def build_cartesian_tree(arr: List[T]) -> Optional[CartesianTreeNode]:
     """
     Build a Cartesian Tree from a given array.
     
-    The Cartesian Tree for an array is constructed such that:
-    1. In-order traversal results in the original array
-    2. The tree satisfies the heap property
-    
     Args:
         arr: Input list to build the Cartesian Tree from
     
@@ -47,26 +43,37 @@ def build_cartesian_tree(arr: List[T]) -> Optional[CartesianTreeNode]:
     if not arr:
         return None
     
-    # Use a stack to build the Cartesian Tree
-    stack: List[CartesianTreeNode] = []
+    def create_tree(start: int, end: int) -> Optional[CartesianTreeNode]:
+        """
+        Recursively create Cartesian Tree
+        
+        Args:
+            start: Start index of the subarray
+            end: End index of the subarray
+        
+        Returns:
+            Root of the subtree
+        """
+        if start > end:
+            return None
+        
+        # Find the index of the maximum element in the range
+        max_idx = start
+        for i in range(start + 1, end + 1):
+            if arr[i] > arr[max_idx]:
+                max_idx = i
+        
+        # Create root node with max value
+        root = CartesianTreeNode(arr[max_idx])
+        
+        # Recursively build left and right subtrees 
+        root.left = create_tree(start, max_idx - 1)
+        root.right = create_tree(max_idx + 1, end)
+        
+        return root
     
-    for value in arr:
-        # Create a new node
-        node = CartesianTreeNode(value)
-        
-        # Find the rightmost node that should be the parent of current node
-        while stack and stack[-1].value > value:
-            node.left = stack.pop()
-        
-        # If stack is not empty, the last node is the parent of current node
-        if stack:
-            stack[-1].right = node
-        
-        # Push current node to stack
-        stack.append(node)
-    
-    # The last node in the stack is the root of the Cartesian Tree
-    return stack[0]
+    # Build and return the full Cartesian Tree
+    return create_tree(0, len(arr) - 1)
 
 def cartesian_tree_sort(arr: List[T]) -> List[T]:
     """
