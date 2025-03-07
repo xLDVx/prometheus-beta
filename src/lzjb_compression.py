@@ -43,6 +43,7 @@ def lzjb_compress(input_data):
         match_length = 0
         match_offset = 0
         
+        # Check for repeated sequences
         for offset in range(1, min(current_index - window_start + 1, MAX_OFFSET)):
             # Try to match subsequent bytes
             current_match_length = 0
@@ -65,9 +66,26 @@ def lzjb_compress(input_data):
             compressed.append(min(255, token))
             current_index += match_length
         else:
-            # Encode literal
-            compressed.append(input_data[current_index])
-            current_index += 1
+            # Special handling for repeated single character
+            current_char = input_data[current_index]
+            repeat_count = 1
+            
+            # Look ahead for repeated character
+            while (current_index + repeat_count < input_length and 
+                   repeat_count < MAX_LENGTH and
+                   input_data[current_index + repeat_count] == current_char):
+                repeat_count += 1
+            
+            if repeat_count > 2:
+                # Use a special token for repeated character
+                token = ((0 - 1) << 3) | (repeat_count - 3)
+                compressed.append(min(255, token))
+                compressed.append(current_char)
+                current_index += repeat_count
+            else:
+                # Encode literal
+                compressed.append(current_char)
+                current_index += 1
     
     return bytes(compressed)
 
@@ -100,23 +118,33 @@ def lzjb_decompress(compressed_data):
         token = compressed_data[current_index]
         current_index += 1
         
-        if token < 32:  # Match token (0-31)
-            # Extract offset and length
-            match_offset = ((token >> 3) + 1)
-            match_length = (token & 0x7) + 3
-            
-            # Reconstruct match
-            if len(decompressed) < match_offset:
-                # Not enough context, treat as literal
-                decompressed.append(token)
-                continue
-            
-            start_pos = len(decompressed) - match_offset
-            for _ in range(match_length):
-                if start_pos < 0:
+        if token < 32:  # Match or repeat token (0-31)
+            # Check if it's a special repeated character case
+            if token == 0:
+                # Next byte is repeated character
+                if current_index >= len(compressed_data):
                     break
-                decompressed.append(decompressed[start_pos])
-                start_pos += 1
+                repeat_char = compressed_data[current_index]
+                current_index += 1
+                repeat_length = (token & 0x7) + 3
+                decompressed.extend([repeat_char] * repeat_length)
+            else:
+                # Extract offset and length
+                match_offset = ((token >> 3) + 1)
+                match_length = (token & 0x7) + 3
+                
+                # Reconstruct match
+                if len(decompressed) < match_offset:
+                    # Not enough context, treat as literal
+                    decompressed.append(token)
+                    continue
+                
+                start_pos = len(decompressed) - match_offset
+                for _ in range(match_length):
+                    if start_pos < 0:
+                        break
+                    decompressed.append(decompressed[start_pos])
+                    start_pos += 1
         else:
             # Literal byte
             decompressed.append(token)
