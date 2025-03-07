@@ -20,7 +20,7 @@ def hungarian_algorithm(cost_matrix):
         ValueError: If the input is not a valid square matrix
     """
     # Convert to numpy array for easier manipulation
-    matrix = np.array(cost_matrix, dtype=float)
+    matrix = np.array(cost_matrix, dtype=float).copy()
     
     # Validate input
     if matrix.ndim != 2 or matrix.shape[0] != matrix.shape[1]:
@@ -28,53 +28,45 @@ def hungarian_algorithm(cost_matrix):
     
     n = matrix.shape[0]
     
-    # Optimization: track best path for each row
+    # Step 1: Subtract row minimums
+    for i in range(n):
+        matrix[i] -= matrix[i].min()
+    
+    # Step 2: Subtract column minimums
+    for j in range(n):
+        matrix[:, j] -= matrix[:, j].min()
+    
+    # Initialize assignments and marks
     row_cover = [False] * n
     col_cover = [False] * n
-    
-    # Step 1: Row reduction
-    for i in range(n):
-        row_min = matrix[i].min()
-        matrix[i] -= row_min
-    
-    # Step 2: Column reduction
-    for j in range(n):
-        col_min = matrix[:, j].min()
-        matrix[:, j] -= col_min
+    starred_zeros = [None] * n
+    primed_zeros = [None] * n
     
     # Find initial assignment
-    assignments = [-1] * n
     for i in range(n):
-        # Find zero in uncovered row with no other zeros in its column
-        zero_cols = np.where(matrix[i] == 0)[0]
-        for col in zero_cols:
-            if not col_cover[col]:
-                assignments[i] = col
+        for j in range(n):
+            if matrix[i, j] == 0 and not row_cover[i] and not col_cover[j]:
+                starred_zeros[i] = j
                 row_cover[i] = True
-                col_cover[col] = True
+                col_cover[j] = True
                 break
     
-    # Find minimum cost assignment
-    def find_optimal_assignment():
-        max_iterations = n * n  # Prevent infinite loop
-        for _ in range(max_iterations):
-            # Check if assignment is complete
-            if all(x != -1 for x in assignments):
-                return assignments
-            
-            # Find zeros and cover lines
-            zero_lines = 0
-            # Reset covers
-            row_cover[:] = [False] * n
-            col_cover[:] = [False] * n
-            
-            # Cover rows and columns of assigned zeros
-            for i in range(n):
-                if assignments[i] != -1:
-                    row_cover[i] = True
-                    col_cover[assignments[i]] = True
-            
-            # Find the smallest uncovered value
+    # Additional steps for finding optimal assignment
+    while True:
+        # Find an uncovered zero
+        uncovered_zero = None
+        for i in range(n):
+            if not row_cover[i]:
+                for j in range(n):
+                    if matrix[i, j] == 0 and not col_cover[j]:
+                        uncovered_zero = (i, j)
+                        break
+                if uncovered_zero:
+                    break
+        
+        # If no uncovered zero, create more
+        if uncovered_zero is None:
+            # Find minimum uncovered value
             min_val = float('inf')
             for i in range(n):
                 for j in range(n):
@@ -84,28 +76,62 @@ def hungarian_algorithm(cost_matrix):
             # Adjust matrix
             for i in range(n):
                 for j in range(n):
-                    # Add min to covered rows
                     if row_cover[i]:
                         matrix[i, j] += min_val
-                    # Subtract min from uncovered columns
                     if not col_cover[j]:
                         matrix[i, j] -= min_val
             
-            # Try to find new assignments
-            for i in range(n):
-                if assignments[i] == -1:
-                    zero_cols = np.where(matrix[i] == 0)[0]
-                    for col in zero_cols:
-                        if not col_cover[col]:
-                            assignments[i] = col
-                            row_cover[i] = True
-                            col_cover[col] = True
-                            break
+            continue
         
-        return assignments
+        # Check if zero can be added to assignment
+        i, j = uncovered_zero
+        if starred_zeros[i] is None:
+            # Augmenting path algorithm
+            path = []
+            path.append((i, j))
+            
+            while True:
+                # Find starred zero in the same column
+                starred_row = None
+                for r in range(n):
+                    if starred_zeros[r] == j:
+                        starred_row = r
+                        break
+                
+                if starred_row is None:
+                    break
+                
+                # Find prime zero in the starred zero's row
+                primed_col = None
+                for c in range(n):
+                    if primed_zeros[starred_row] == c:
+                        primed_col = c
+                        break
+                
+                path.append((starred_row, j))
+                path.append((starred_row, primed_col))
+                j = primed_col
+                
+                # Update starred and primed zeros
+                for p_i, p_j in path:
+                    if starred_zeros[p_i] == p_j:
+                        starred_zeros[p_i] = None
+                    if primed_zeros[p_i] == p_j:
+                        starred_zeros[p_i] = p_j
+                
+                # Reset covers and primed zeros
+                row_cover = [False] * n
+                col_cover = [False] * n
+                primed_zeros = [None] * n
+                
+                # New assignment
+                break
     
-    # Find the optimal assignment
-    assignments = find_optimal_assignment()
+    # Compute optimal assignment
+    assignments = [None] * n
+    for i in range(n):
+        if starred_zeros[i] is not None:
+            assignments[i] = starred_zeros[i]
     
     # Calculate total cost
     total_cost = sum(cost_matrix[i][assignments[i]] for i in range(n))
