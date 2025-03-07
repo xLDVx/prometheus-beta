@@ -38,34 +38,46 @@ def lz4_compress(data):
     i = 0
     
     while i < len(data):
-        # Look-ahead window for matching
-        match_length = 0
-        match_offset = 0
+        # Literal bytes
+        start_i = i
         
-        # Search backward for longest match
-        for j in range(max(0, i - 65535), i):
-            current_match_length = 0
-            
-            # Check how long the match continues
-            while (i + current_match_length < len(data) and 
-                   data[j + current_match_length] == data[i + current_match_length] and 
-                   current_match_length < 255):
-                current_match_length += 1
-            
-            # Update best match
-            if current_match_length > match_length:
-                match_length = current_match_length
-                match_offset = i - j
+        # Look for repeated sequences
+        while i < len(data) and i - start_i < 255:
+            # Try to find a match at most 65535 bytes back
+            match_found = False
+            for j in range(max(0, start_i - 65535), start_i):
+                match_length = 0
+                while (i + match_length < len(data) and 
+                       data[j + match_length] == data[i + match_length] and 
+                       match_length < 255):
+                    match_length += 1
+                
+                # Long enough match found
+                if match_length > 3:
+                    # If we've stored some literals, do so
+                    lit_len = start_i - i
+                    if lit_len > 0:
+                        compressed.append(lit_len)
+                        compressed.extend(data[i:start_i])
+                    
+                    # Store match token
+                    compressed.append(match_length)
+                    compressed.extend((start_i - j).to_bytes(2, byteorder='little'))
+                    
+                    # Advance pointers
+                    i = start_i + match_length
+                    match_found = True
+                    break
+                
+            # No match or too short match
+            if not match_found:
+                i += 1
         
-        # If no good match found, store literal
-        if match_length < 4:
-            compressed.append(data[i])
-            i += 1
-        else:
-            # Store token, offset, and continue
-            compressed.append(match_length)
-            compressed.extend(match_offset.to_bytes(2, byteorder='little'))
-            i += match_length
+        # Store remaining literals if any
+        if i > start_i:
+            lit_len = i - start_i
+            compressed.append(lit_len)
+            compressed.extend(data[start_i:i])
     
     return bytes(compressed)
 
@@ -95,46 +107,34 @@ def lz4_decompress(compressed_data):
     i = 0
     
     while i < len(compressed_data):
-        # Handle remaining literals for short compressed data
-        if i + 3 >= len(compressed_data):
-            # If not enough bytes for a full token, treat as literals
-            decompressed.append(compressed_data[i])
-            i += 1
-            continue
+        # Extract literal length
+        lit_len = compressed_data[i]
+        i += 1
         
-        token = compressed_data[i]
+        # Copy literals
+        if lit_len > 0:
+            if i + lit_len > len(compressed_data):
+                raise ValueError("Invalid compressed data: not enough literals")
+            decompressed.extend(compressed_data[i:i+lit_len])
+            i += lit_len
         
-        # If token is less than 4, it's a literal
-        if token < 4:
-            decompressed.append(compressed_data[i])
-            i += 1
-        else:
-            # Extract match length and offset
-            match_length = token
-            match_offset = int.from_bytes(compressed_data[i+1:i+3], byteorder='little')
-            
-            # Reconstruct matched sequence
-            # Use the current decompressed data as the source for copying
-            start = len(decompressed) - match_offset
-            
-            # Ensure start is non-negative and add repeated bytes
-            if start >= 0:
-                for j in range(match_length):
-                    if start + j < len(decompressed):
-                        decompressed.append(decompressed[start + j])
-                    else:
-                        # If we run out of source bytes, pad with last known byte
-                        decompressed.append(decompressed[-1])
-            else:
-                # If start is negative, it means we don't have enough prior bytes
-                # Fall back to literal copying or padding
-                for j in range(match_length):
-                    if decompressed:
-                        decompressed.append(decompressed[-1])
-                    else:
-                        # This should rarely happen if the compression was correct
-                        decompressed.append(0)
-            
-            i += 3
+        # Check if we've reached the end
+        if i >= len(compressed_data):
+            break
+        
+        # Extract match token and offset
+        match_len = compressed_data[i]
+        match_offset = int.from_bytes(compressed_data[i+1:i+3], byteorder='little')
+        i += 3
+        
+        # Reconstruct matched sequence
+        start = len(decompressed) - match_offset
+        if start < 0:
+            raise ValueError("Invalid compressed data: back-reference out of bounds")
+        
+        for j in range(match_len):
+            if start + j >= len(decompressed):
+                break
+            decompressed.append(decompressed[start + j])
     
     return bytes(decompressed)
