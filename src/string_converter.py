@@ -15,7 +15,7 @@ def to_alternating_path_case(input_string: str) -> str:
         >>> to_alternating_path_case("hello world")
         "Hello/world"
         >>> to_alternating_path_case("python is awesome")
-        "Python/is/awesome"
+        "Python/is/Awesome"
     """
     # Validate input
     if not isinstance(input_string, str):
@@ -31,8 +31,12 @@ def to_alternating_path_case(input_string: str) -> str:
     # Alternate capitalization
     result = []
     for i, word in enumerate(words):
-        # Capitalize first word, lowercase subsequent words when index is odd
-        modified_word = word.capitalize() if i % 2 == 0 else word.lower()
+        # Capitalize first word, oddly placed words get full case correction
+        if i % 2 == 0:
+            modified_word = word.capitalize()
+        else:
+            # For odd-indexed words, correct case to match surrounding words
+            modified_word = word.capitalize() if word.istitle() else word.lower()
         result.append(modified_word)
     
     # Join with '/'
