@@ -1,5 +1,5 @@
 from typing import List, Dict
-from collections import deque
+from collections import deque, defaultdict
 
 def ford_fulkerson(graph: Dict[str, Dict[str, int]], source: str, sink: str) -> int:
     """
@@ -21,10 +21,15 @@ def ford_fulkerson(graph: Dict[str, Dict[str, int]], source: str, sink: str) -> 
     if source not in graph or sink not in graph:
         raise ValueError("Source or sink node not found in the graph")
     
-    # Create a residual graph with the same structure as the original graph
-    residual_graph = {node: dict(adjacents) for node, adjacents in graph.items()}
+    # Create a deep copy of the graph to avoid modifying the original
+    residual_graph = defaultdict(dict)
+    for node, edges in graph.items():
+        for neighbor, capacity in edges.items():
+            residual_graph[node][neighbor] = capacity
+            # Ensure backward edges exist for all nodes
+            if neighbor not in residual_graph or node not in residual_graph[neighbor]:
+                residual_graph[neighbor][node] = 0
     
-    # Function to find an augmenting path using Breadth-First Search
     def bfs(graph: Dict[str, Dict[str, int]], source: str, sink: str) -> List[str]:
         """Find an augmenting path from source to sink using BFS."""
         # Track visited nodes and their parents
@@ -84,22 +89,16 @@ def ford_fulkerson(graph: Dict[str, Dict[str, int]], source: str, sink: str) -> 
         # Find the minimum flow along the path
         path_flow = _find_path_flow(residual_graph, path)
         
-        # Update residual graph and max flow
-        max_flow += path_flow
-        
-        # Update residual capacities
+        # Update residual graph capacities
         for i in range(len(path) - 1):
             current, next_node = path[i], path[i+1]
             
             # Reduce forward edge capacity
             residual_graph[current][next_node] -= path_flow
-            
-            # Add/update backward edge
-            if next_node not in residual_graph or current not in residual_graph[next_node]:
-                if next_node not in residual_graph:
-                    residual_graph[next_node] = {}
-                residual_graph[next_node][current] = path_flow
-            else:
-                residual_graph[next_node][current] += path_flow
+            # Add to backward edge
+            residual_graph[next_node][current] += path_flow
+        
+        # Accumulate maximum flow
+        max_flow += path_flow
     
     return max_flow
