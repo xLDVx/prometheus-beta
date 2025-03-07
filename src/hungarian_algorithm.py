@@ -28,63 +28,84 @@ def hungarian_algorithm(cost_matrix):
     
     n = matrix.shape[0]
     
-    # Step 1: Subtract row minimums
+    # Optimization: track best path for each row
+    row_cover = [False] * n
+    col_cover = [False] * n
+    
+    # Step 1: Row reduction
     for i in range(n):
-        matrix[i] -= matrix[i].min()
+        row_min = matrix[i].min()
+        matrix[i] -= row_min
     
-    # Step 2: Subtract column minimums
+    # Step 2: Column reduction
     for j in range(n):
-        matrix[:, j] -= matrix[:, j].min()
+        col_min = matrix[:, j].min()
+        matrix[:, j] -= col_min
     
-    # Track covered rows and columns
-    covered_rows = set()
-    covered_cols = set()
-    
-    # Find initial zero assignments
+    # Find initial assignment
     assignments = [-1] * n
     for i in range(n):
+        # Find zero in uncovered row with no other zeros in its column
         zero_cols = np.where(matrix[i] == 0)[0]
         for col in zero_cols:
-            if col not in covered_cols:
+            if not col_cover[col]:
                 assignments[i] = col
-                covered_rows.add(i)
-                covered_cols.add(col)
+                row_cover[i] = True
+                col_cover[col] = True
                 break
     
-    # Continue until we have a complete assignment
-    while len(covered_rows) < n:
-        # Find uncovered zeros
-        uncovered_zeros = []
-        for i in range(n):
-            if i not in covered_rows:
-                zero_cols = np.where(matrix[i] == 0)[0]
-                for col in zero_cols:
-                    if col not in covered_cols:
-                        uncovered_zeros.append((i, col))
-        
-        # If no uncovered zeros, modify matrix
-        if not uncovered_zeros:
-            # Find minimum uncovered value
+    # Find minimum cost assignment
+    def find_optimal_assignment():
+        max_iterations = n * n  # Prevent infinite loop
+        for _ in range(max_iterations):
+            # Check if assignment is complete
+            if all(x != -1 for x in assignments):
+                return assignments
+            
+            # Find zeros and cover lines
+            zero_lines = 0
+            # Reset covers
+            row_cover[:] = [False] * n
+            col_cover[:] = [False] * n
+            
+            # Cover rows and columns of assigned zeros
+            for i in range(n):
+                if assignments[i] != -1:
+                    row_cover[i] = True
+                    col_cover[assignments[i]] = True
+            
+            # Find the smallest uncovered value
             min_val = float('inf')
             for i in range(n):
                 for j in range(n):
-                    if i not in covered_rows and j not in covered_cols:
+                    if not row_cover[i] and not col_cover[j]:
                         min_val = min(min_val, matrix[i, j])
             
             # Adjust matrix
             for i in range(n):
                 for j in range(n):
-                    if i in covered_rows:
+                    # Add min to covered rows
+                    if row_cover[i]:
                         matrix[i, j] += min_val
-                    if j not in covered_cols:
+                    # Subtract min from uncovered columns
+                    if not col_cover[j]:
                         matrix[i, j] -= min_val
+            
+            # Try to find new assignments
+            for i in range(n):
+                if assignments[i] == -1:
+                    zero_cols = np.where(matrix[i] == 0)[0]
+                    for col in zero_cols:
+                        if not col_cover[col]:
+                            assignments[i] = col
+                            row_cover[i] = True
+                            col_cover[col] = True
+                            break
         
-        # Assign new zeros
-        for i, col in uncovered_zeros:
-            if assignments[i] == -1:
-                assignments[i] = col
-                covered_rows.add(i)
-                covered_cols.add(col)
+        return assignments
+    
+    # Find the optimal assignment
+    assignments = find_optimal_assignment()
     
     # Calculate total cost
     total_cost = sum(cost_matrix[i][assignments[i]] for i in range(n))
