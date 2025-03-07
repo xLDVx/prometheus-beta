@@ -1,7 +1,8 @@
 """
 LZJB-Inspired Compression Algorithm Implementation
 
-This module provides a simplified compression algorithm inspired by LZJB.
+This module provides a simplified compression algorithm 
+inspired by the principles of LZJB compression.
 """
 
 def lzjb_compress(input_data):
@@ -25,6 +26,10 @@ def lzjb_compress(input_data):
     if not input_data:
         raise ValueError("Input cannot be empty")
     
+    # Compression parameters
+    MAX_OFFSET = 1024
+    MAX_LENGTH = 255
+    
     # Compression implementation
     compressed = bytearray()
     input_length = len(input_data)
@@ -32,18 +37,17 @@ def lzjb_compress(input_data):
     
     while current_index < input_length:
         # Define search window
-        window_start = max(0, current_index - 1024)
-        window = input_data[window_start:current_index]
+        window_start = max(0, current_index - MAX_OFFSET)
         
         # Find longest match
         match_length = 0
         match_offset = 0
         
-        for offset in range(1, min(current_index - window_start + 1, 1024)):
+        for offset in range(1, min(current_index - window_start + 1, MAX_OFFSET)):
             # Try to match subsequent bytes
             current_match_length = 0
             while (current_index + current_match_length < input_length and
-                   current_match_length < 255 and
+                   current_match_length < MAX_LENGTH and
                    input_data[current_index + current_match_length] == 
                    input_data[current_index - offset + current_match_length]):
                 current_match_length += 1
@@ -96,18 +100,17 @@ def lzjb_decompress(compressed_data):
         token = compressed_data[current_index]
         current_index += 1
         
-        if token < 32:  # Match token
+        if token < 32:  # Match token (0-31)
             # Extract offset and length
             match_offset = ((token >> 3) + 1)
             match_length = (token & 0x7) + 3
             
-            # Sanity check for match
+            # Reconstruct match
             if len(decompressed) < match_offset:
-                # Fallback: treat as literal if not enough context
+                # Not enough context, treat as literal
                 decompressed.append(token)
                 continue
             
-            # Reconstruct match
             start_pos = len(decompressed) - match_offset
             for _ in range(match_length):
                 if start_pos < 0:
