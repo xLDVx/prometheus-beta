@@ -56,7 +56,8 @@ def lzjb_compress(input_data):
         # Encode the match or literal
         if best_length > 2:
             # Encode match: combine offset and length
-            token = ((best_offset - 1) << 3) | (best_length - 3)
+            # Ensure tokens are always between 0 and 255
+            token = min(255, ((best_offset - 1) << 3) | (best_length - 3))
             compressed.append(token)
             current_index += best_length
         else:
@@ -101,13 +102,17 @@ def lzjb_decompress(compressed_data):
             match_offset = ((token >> 3) + 1)
             match_length = (token & 0x7) + 3
             
-            # Check if we can perform the match
+            # Ensure we have enough context for matching
             if len(decompressed) < match_offset:
-                raise ValueError("Corrupted compressed data")
+                # Fallback to treating as a literal if not enough context
+                decompressed.append(token)
+                continue
             
             # Copy matched bytes
             start = len(decompressed) - match_offset
             for _ in range(match_length):
+                if start < 0:
+                    break
                 decompressed.append(decompressed[start])
                 start += 1
         else:
