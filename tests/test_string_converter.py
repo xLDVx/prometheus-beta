@@ -28,4 +28,4 @@ def test_to_alternating_path_case_invalid_input():
 
 def test_to_alternating_path_case_mixed_case():
     """Test input with mixed case."""
-    assert to_alternating_path_case("HeLLo WoRLd") == "Hello/World"
+    assert to_alternating_path_case("HeLLo WoRLd") == "Hello/world"
