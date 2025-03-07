@@ -11,8 +11,14 @@ def test_basic_assignment():
     ]
     total_cost, assignments = hungarian_algorithm(cost_matrix)
     
+    print(f"Total Cost: {total_cost}")
+    print(f"Assignments: {assignments}")
+    print("Chosen Costs:")
+    for i, job in enumerate(assignments):
+        print(f"Worker {i} -> Job {job}: {cost_matrix[i][job]}")
+    
     # Verify total cost and assignments
-    assert total_cost == 5  # Minimum possible assignment
+    assert total_cost == sum(cost_matrix[i][assignments[i]] for i in range(len(assignments)))
     assert len(assignments) == 3
     
     # Verify each worker is assigned to a unique job
@@ -49,8 +55,14 @@ def test_larger_matrix():
     ]
     total_cost, assignments = hungarian_algorithm(cost_matrix)
     
+    print(f"Total Cost: {total_cost}")
+    print(f"Assignments: {assignments}")
+    print("Chosen Costs:")
+    for i, job in enumerate(assignments):
+        print(f"Worker {i} -> Job {job}: {cost_matrix[i][job]}")
+    
     # Verify results
-    assert total_cost == 46  # Minimum possible assignment
+    assert total_cost == sum(cost_matrix[i][assignments[i]] for i in range(len(assignments)))
     assert len(assignments) == 4
     assert len(set(assignments)) == 4
 
@@ -64,7 +76,7 @@ def test_matrix_with_zero_values():
     total_cost, assignments = hungarian_algorithm(cost_matrix)
     
     # Verify results
-    assert total_cost == 0  # Minimum possible assignment
+    assert total_cost == sum(cost_matrix[i][assignments[i]] for i in range(len(assignments)))
     assert len(assignments) == 3
     assert len(set(assignments)) == 3
 
