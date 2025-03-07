@@ -26,10 +26,11 @@ def convert_to_uppercase_with_spaces(input_string):
         return input_string
     
     # Use regex to add spaces before uppercase letters
-    # Capture two scenarios:
-    # 1. Lowercase letter followed by uppercase letter
-    # 2. Lowercase letter or number followed by uppercase letter
-    spaced_string = re.sub(r'(?<=[a-z0-9])(?=[A-Z])', ' ', input_string)
+    # Special handling for consecutive uppercase letters
+    spaced_string = re.sub(r'([a-z0-9])([A-Z])', r'\1 \2', input_string)
+    
+    # Additional regex to handle consecutive uppercase letters
+    spaced_string = re.sub(r'([A-Z])([A-Z][a-z])', r'\1 \2', spaced_string)
     
     # Convert to uppercase
     return spaced_string.upper()
