@@ -1,12 +1,12 @@
 """
-LZJB Compression Algorithm Implementation
+LZJB-Inspired Compression Algorithm Implementation
 
-This module provides functionality for LZJB-inspired compression.
+This module provides a simplified compression algorithm inspired by LZJB.
 """
 
 def lzjb_compress(input_data):
     """
-    Compress input data using a LZJB-inspired algorithm.
+    Compress input data using a simplified LZJB-inspired algorithm.
     
     Args:
         input_data (bytes): The input data to be compressed.
@@ -31,35 +31,35 @@ def lzjb_compress(input_data):
     current_index = 0
     
     while current_index < input_length:
-        # Search window (look back limited distance)
+        # Define search window
         window_start = max(0, current_index - 1024)
         window = input_data[window_start:current_index]
         
         # Find longest match
-        best_length = 0
-        best_offset = 0
+        match_length = 0
+        match_offset = 0
         
         for offset in range(1, min(current_index - window_start + 1, 1024)):
-            # Start matching
-            match_length = 0
-            max_match = min(255, input_length - current_index)
-            
-            while (match_length < max_match and 
-                   input_data[current_index + match_length] == 
-                   input_data[current_index - offset + match_length]):
-                match_length += 1
+            # Try to match subsequent bytes
+            current_match_length = 0
+            while (current_index + current_match_length < input_length and
+                   current_match_length < 255 and
+                   input_data[current_index + current_match_length] == 
+                   input_data[current_index - offset + current_match_length]):
+                current_match_length += 1
             
             # Update best match
-            if match_length > best_length:
-                best_length = match_length
-                best_offset = offset
+            if current_match_length > match_length:
+                match_length = current_match_length
+                match_offset = offset
         
-        # Encoding decision
-        if best_length > 2:
-            # Encode match (packed token)
-            token = min(255, ((best_offset - 1) << 3) | (best_length - 3))
-            compressed.append(token)
-            current_index += best_length
+        # Encode match or literal
+        if match_length > 2:
+            # Encode match with packed token
+            # Shift offset and combine with length
+            token = ((match_offset - 1) << 3) | (match_length - 3)
+            compressed.append(min(255, token))
+            current_index += match_length
         else:
             # Encode literal
             compressed.append(input_data[current_index])
@@ -69,7 +69,7 @@ def lzjb_compress(input_data):
 
 def lzjb_decompress(compressed_data):
     """
-    Decompress data compressed with the LZJB-inspired algorithm.
+    Decompress data compressed with the simplified LZJB-inspired algorithm.
     
     Args:
         compressed_data (bytes): The compressed input data.
@@ -90,20 +90,20 @@ def lzjb_decompress(compressed_data):
     
     # Decompression implementation
     decompressed = bytearray()
+    current_index = 0
     
-    i = 0
-    while i < len(compressed_data):
-        token = compressed_data[i]
-        i += 1
+    while current_index < len(compressed_data):
+        token = compressed_data[current_index]
+        current_index += 1
         
         if token < 32:  # Match token
             # Extract offset and length
             match_offset = ((token >> 3) + 1)
             match_length = (token & 0x7) + 3
             
-            # Validate context
+            # Sanity check for match
             if len(decompressed) < match_offset:
-                # Fallback: treat as literal
+                # Fallback: treat as literal if not enough context
                 decompressed.append(token)
                 continue
             
