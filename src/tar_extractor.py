@@ -47,16 +47,20 @@ def extract_tar_archive(archive_path: str,
             for file in specific_files:
                 try:
                     tar.extract(file, path=extract_path)
-                    extracted_files.append(os.path.join(extract_path, file))
+                    full_path = os.path.join(extract_path, file)
+                    extracted_files.append(full_path)
                 except KeyError:
                     # Skip files not in the archive
                     continue
         else:
             # Extract all files
-            tar.extractall(path=extract_path)
+            tar.extractall(path=extract_path, filter='data')
+            
+            # Filter out only the actual files (not directories)
             extracted_files = [
                 os.path.join(extract_path, name) 
-                for name in tar.getnames()
+                for name in tar.getnames() 
+                if os.path.isfile(os.path.join(extract_path, name))
             ]
 
     return extracted_files
