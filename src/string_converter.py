@@ -25,22 +25,24 @@ def convert_to_uppercase_with_spaces(input_string):
     
     # Convert to uppercase and add spaces between words
     result = []
-    prev_was_upper = False
     for i, char in enumerate(input_string):
         # Preserve existing spaces
         if char.isspace():
             result.append(char.upper())
-            prev_was_upper = False
             continue
         
         # Add space before uppercase letters
-        if i > 0 and char.isupper():
-            # Add space if previous char was lowercase 
-            # or if this is start of a new uppercase sequence after a lowercase letter
-            if not prev_was_upper and not input_string[i-1].isspace():
+        if i > 0:
+            # Add space before an uppercase letter if:
+            # 1. Previous character was lowercase
+            # 2. Previous character was not a space
+            # 3. This character is uppercase 
+            if (input_string[i-1].islower() or 
+                (input_string[i-1].isupper() and input_string[i].isupper() and 
+                 (i+1 == len(input_string) or not input_string[i+1].isupper())) and 
+                not input_string[i-1].isspace()):
                 result.append(' ')
         
         result.append(char.upper())
-        prev_was_upper = char.isupper()
     
     return ''.join(result)
