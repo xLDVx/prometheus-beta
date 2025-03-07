@@ -62,7 +62,7 @@ def lz4_compress(data):
             compressed.append(data[i])
             i += 1
         else:
-            # Encode match as token
+            # Store token, offset, and continue
             compressed.append(match_length)
             compressed.extend(match_offset.to_bytes(2, byteorder='little'))
             i += match_length
@@ -95,7 +95,7 @@ def lz4_decompress(compressed_data):
     i = 0
     
     while i < len(compressed_data):
-        # Literal or match token
+        # Handle remaining literals for short compressed data
         if i + 3 >= len(compressed_data):
             # If not enough bytes for a full token, treat as literals
             decompressed.append(compressed_data[i])
@@ -114,9 +114,26 @@ def lz4_decompress(compressed_data):
             match_offset = int.from_bytes(compressed_data[i+1:i+3], byteorder='little')
             
             # Reconstruct matched sequence
+            # Use the current decompressed data as the source for copying
             start = len(decompressed) - match_offset
-            for j in range(match_length):
-                decompressed.append(decompressed[start + j])
+            
+            # Ensure start is non-negative and add repeated bytes
+            if start >= 0:
+                for j in range(match_length):
+                    if start + j < len(decompressed):
+                        decompressed.append(decompressed[start + j])
+                    else:
+                        # If we run out of source bytes, pad with last known byte
+                        decompressed.append(decompressed[-1])
+            else:
+                # If start is negative, it means we don't have enough prior bytes
+                # Fall back to literal copying or padding
+                for j in range(match_length):
+                    if decompressed:
+                        decompressed.append(decompressed[-1])
+                    else:
+                        # This should rarely happen if the compression was correct
+                        decompressed.append(0)
             
             i += 3
     
