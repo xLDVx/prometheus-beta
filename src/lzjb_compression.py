@@ -78,8 +78,9 @@ def lzjb_compress(input_data):
             
             if repeat_count > 2:
                 # Use a special token for repeated character
-                token = ((0 - 1) << 3) | (repeat_count - 3)
-                compressed.append(min(255, token))
+                # Ensure token is within 0-255 range
+                token = min(255, (repeat_count - 3))
+                compressed.append(token)
                 compressed.append(current_char)
                 current_index += repeat_count
             else:
@@ -120,13 +121,18 @@ def lzjb_decompress(compressed_data):
         
         if token < 32:  # Match or repeat token (0-31)
             # Check if it's a special repeated character case
-            if token == 0:
-                # Next byte is repeated character
+            if token < 16:
+                # Repeated character case
+                repeat_length = token + 3
+                
+                # Ensure there's a character to repeat
                 if current_index >= len(compressed_data):
                     break
+                
                 repeat_char = compressed_data[current_index]
                 current_index += 1
-                repeat_length = (token & 0x7) + 3
+                
+                # Repeat the character
                 decompressed.extend([repeat_char] * repeat_length)
             else:
                 # Extract offset and length
