@@ -24,7 +24,7 @@ def test_find_local_max_values_descending():
 
 
 def test_find_local_max_values_all_equal():
-    """Test list with all equal elements returns first or last"""
+    """Test list with all equal elements returns that element"""
     assert find_local_max_values([2, 2, 2, 2]) == [2]
 
 
