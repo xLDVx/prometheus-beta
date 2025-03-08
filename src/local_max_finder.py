@@ -43,7 +43,7 @@ def find_local_max_values(arr: List[int]) -> List[int]:
     local_max = []
     
     # Check first element
-    if arr[0] > arr[1]:
+    if len(arr) > 1 and arr[0] > arr[1]:
         local_max.append(arr[0])
     
     # Check middle elements
@@ -52,15 +52,21 @@ def find_local_max_values(arr: List[int]) -> List[int]:
             local_max.append(arr[i])
     
     # Check last element
-    if arr[-1] > arr[-2]:
+    if len(arr) > 1 and arr[-1] > arr[-2]:
         local_max.append(arr[-1])
     
     # Special cases
     if not local_max:
-        # If no local maximums, check for equal elements
+        # If no local maximums, check for equal elements 
         if len(set(arr)) == 1:
             return [arr[0]]
         # If last attempt fails, find highest point
         return [max(arr)]
     
-    return local_max
+    # Remove duplicates while preserving order
+    unique_local_max = []
+    for val in local_max:
+        if val not in unique_local_max:
+            unique_local_max.append(val)
+    
+    return unique_local_max
