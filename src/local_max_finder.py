@@ -55,9 +55,12 @@ def find_local_max_values(arr: List[int]) -> List[int]:
     if arr[-1] > arr[-2]:
         local_max.append(arr[-1])
     
-    # Special case: if no local max found and all equal, return first/last
-    if not local_max and len(set(arr)) == 1:
-        local_max.append(arr[0])
+    # Special cases
+    if not local_max:
+        # If no local maximums, check for equal elements
+        if len(set(arr)) == 1:
+            return [arr[0]]
+        # If last attempt fails, find highest point
+        return [max(arr)]
     
-    # Remove duplicate local max values while preserving order
-    return list(dict.fromkeys(local_max))
+    return local_max
