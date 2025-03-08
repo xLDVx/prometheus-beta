@@ -19,6 +19,7 @@ def find_missing_numbers(arr):
     is_ascending = arr[0] <= arr[-1]
     
     # Normalize to ascending order for consistent processing
+    original_arr = arr
     if not is_ascending:
         arr = sorted(arr, reverse=True)
     
@@ -40,4 +41,6 @@ def find_missing_numbers(arr):
         ]
     
     # If originally descending, return in descending order
-    return sorted(missing, reverse=not is_ascending)
+    if len(original_arr) > 1 and original_arr[0] > original_arr[-1]:
+        return list(reversed(missing))
+    return missing
