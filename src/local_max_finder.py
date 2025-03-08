@@ -10,6 +10,11 @@ def find_local_max_values(arr: List[int]) -> List[int]:
     they are considered local maximums if they are greater than their 
     single adjacent neighbor.
     
+    This implementation follows a strict definition:
+    - A local maximum must be strictly greater than its neighbors
+    - Ties do not count as local maximums
+    - If no local maximums exist, it returns the global maximum
+    
     Args:
         arr (List[int]): Input array of integers
     
