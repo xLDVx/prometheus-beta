@@ -59,4 +59,5 @@ def find_local_max_values(arr: List[int]) -> List[int]:
     if not local_max and len(set(arr)) == 1:
         local_max.append(arr[0])
     
-    return local_max
+    # Remove duplicate local max values while preserving order
+    return list(dict.fromkeys(local_max))
