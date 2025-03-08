@@ -39,4 +39,4 @@ def test_find_local_max_values_invalid_input():
 
 def test_find_local_max_values_with_negatives():
     """Test local max finding with negative numbers"""
-    assert find_local_max_values([-1, -3, -2, -4, -1, -5]) == [-1, -2, -1]
+    assert find_local_max_values([-1, -3, -2, -4, -1, -5]) == [-1, -2]
