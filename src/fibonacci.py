@@ -1,5 +1,5 @@
 """
-Extended Fibonacci sequence generator that supports negative indices and float inputs.
+Extended Fibonacci sequence generator that supports negative numbers and floats.
 
 The implementation follows these key principles:
 - Supports positive and negative integer indices
@@ -38,11 +38,15 @@ def fibonacci(n):
                 a, b = b, a + b
             return b
         else:
-            # Negative integer indices (use generalized recurrence)
+            # Negative integer indices (using generalized recurrence relation)
+            # Alternate sign for negative indices
+            sign = -1 if n % 2 == 0 else 1
+            
             a, b = 0, 1
-            for _ in range(0, abs(n) - 1):
-                a, b = b - a, a
-            return a if n % 2 == 0 else -a
+            for _ in range(abs(n)):
+                a, b = b, a + b
+            
+            return sign * a
     
     # Float index computation using matrix exponentiation and interpolation
     def matrix_power(matrix, power):
