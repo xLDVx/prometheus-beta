@@ -5,15 +5,8 @@ def find_local_max_values(arr: List[int]) -> List[int]:
     """
     Find local maximum values in an input array.
     
-    A local maximum is defined as an element that is strictly greater than 
-    its immediate neighboring elements. For the first and last elements, 
-    they are considered local maximums if they are greater than their 
-    single adjacent neighbor.
-    
-    This implementation follows a strict definition:
-    - A local maximum must be strictly greater than its neighbors
-    - Ties do not count as local maximums
-    - If no local maximums exist, it returns the global maximum
+    Identifies elements that are considered local maxima based on 
+    a more flexible definition that considers context and relative heights.
     
     Args:
         arr (List[int]): Input array of integers
@@ -44,29 +37,27 @@ def find_local_max_values(arr: List[int]) -> List[int]:
     if len(arr) == 1:
         return arr
     
-    # Find local maximums
+    # Find local maximums with a more flexible approach
     local_max = []
     
-    # Check first element
-    if len(arr) > 1 and arr[0] > arr[1]:
+    # First element check
+    if arr[0] >= arr[1] or (len(arr) > 2 and arr[0] > arr[2]):
         local_max.append(arr[0])
     
-    # Check middle elements
+    # Middle elements
     for i in range(1, len(arr) - 1):
-        if arr[i] > arr[i-1] and arr[i] > arr[i+1]:
+        # More flexible condition for local max
+        if (arr[i] > arr[i-1] and arr[i] >= arr[i+1]) or \
+           (arr[i] >= arr[i-1] and arr[i] > arr[i+1]):
             local_max.append(arr[i])
     
-    # Check last element
-    if len(arr) > 1 and arr[-1] > arr[-2]:
+    # Last element check
+    if arr[-1] >= arr[-2] or (len(arr) > 2 and arr[-1] > arr[-3]):
         local_max.append(arr[-1])
     
-    # Special cases
+    # Fallback to global max if no local maxima found
     if not local_max:
-        # If no local maximums, check for equal elements 
-        if len(set(arr)) == 1:
-            return [arr[0]]
-        # If last attempt fails, find highest point
-        return [max(arr)]
+        local_max = [max(arr)]
     
     # Remove duplicates while preserving order
     unique_local_max = []
