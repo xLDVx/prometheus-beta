@@ -10,6 +10,9 @@ def max_sum_increasing_subsequence(nums: List[int]) -> int:
     Returns:
         int: Maximum sum of an increasing subsequence
     
+    Raises:
+        TypeError: If input is not a list or contains non-integer elements
+    
     Time Complexity: O(n log n)
     Space Complexity: O(n)
     
@@ -21,6 +24,14 @@ def max_sum_increasing_subsequence(nums: List[int]) -> int:
         >>> max_sum_increasing_subsequence([])
         0
     """
+    # Type checking
+    if not isinstance(nums, list):
+        raise TypeError("Input must be a list")
+    
+    # Check if all elements are integers
+    if not all(isinstance(x, int) for x in nums):
+        raise TypeError("All elements must be integers")
+    
     # Handle empty input
     if not nums:
         return 0
