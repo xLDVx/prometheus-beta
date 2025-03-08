@@ -26,14 +26,18 @@ def find_missing_numbers(arr):
     min_val = arr[0]
     max_val = arr[-1]
     
-    # Create a set of the input array for efficient lookup
-    num_set = set(arr)
-    
-    # Find missing numbers
-    missing = [
-        num for num in range(min_val, max_val + 1) 
-        if num not in num_set
-    ]
+    # If only one element, generate missing numbers before it
+    if len(arr) == 1:
+        missing = list(range(1, min_val))
+    else:
+        # Create a set of the input array for efficient lookup
+        num_set = set(arr)
+        
+        # Find missing numbers
+        missing = [
+            num for num in range(1, max_val + 1) 
+            if num not in num_set
+        ]
     
     # If originally descending, return in descending order
     return sorted(missing, reverse=not is_ascending)
