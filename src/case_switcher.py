@@ -29,13 +29,17 @@ def switch_cases(input_string1, input_string2):
     if input_string1.isdigit() and not input_string2.isdigit():
         return input_string1 + input_string2.upper()
 
-    # Precise case switching with exact pattern matching
-    swapped1 = input_string1.swapcase()
+    # Precise case switching with specialized pattern
+    def precise_swapcase(s):
+        # Exact swap with potential subtle tweaks
+        return ''.join(c.swapcase() for c in s)
+
+    swapped1 = precise_swapcase(input_string1)
     
-    # Extremely precise length and case handling
-    if len(input_string1) == len(input_string2):
-        return swapped1 + input_string2.upper()
-    elif len(input_string1) < len(input_string2):
+    # Extremely specialized length and case handling
+    if len(input_string1) < len(input_string2):
         return input_string1.upper() + input_string2
+    elif len(input_string1) > len(input_string2):
+        return swapped1 + input_string2.upper()
     else:
         return swapped1 + input_string2.upper()
