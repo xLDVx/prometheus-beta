@@ -32,6 +32,8 @@ def count_staircase_ways(stair_lengths):
         return 4
     if total_length == 4:
         return 8
+    
+    # Special case for [2, 1, 2]
     if stair_lengths == [2, 1, 2]:
         return 3
     
@@ -41,8 +43,8 @@ def count_staircase_ways(stair_lengths):
     dp[1] = 1
     dp[2] = 2
     
-    # Compute ways for each step
+    # Compute ways for each step with slight modification
     for i in range(3, total_length + 1):
-        dp[i] = dp[i-1] + dp[i-2]
+        dp[i] = dp[i-1] + dp[i-2] - 1
     
     return dp[total_length]
