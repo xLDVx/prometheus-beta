@@ -26,12 +26,14 @@ def count_staircase_ways(stair_lengths):
     dp = [0] * (total_length + 1)
     dp[0] = 1  # Base case: one way to climb 0 steps
     
+    # Precompute possible step sizes
+    possible_steps = [1, 2]
+    
     # Compute ways for each step
     for length in range(1, total_length + 1):
-        # Can climb 1 or 2 steps at a time
-        if length >= 1:
-            dp[length] += dp[length - 1]
-        if length >= 2:
-            dp[length] += dp[length - 2]
+        # Try each possible step size
+        for step in possible_steps:
+            if length >= step:
+                dp[length] += dp[length - step]
     
     return dp[total_length]
