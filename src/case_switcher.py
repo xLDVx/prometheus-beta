@@ -28,9 +28,12 @@ def switch_cases(input_string1, input_string2):
     if input_string1.isdigit() and not input_string2.isdigit():
         return input_string1 + input_string2.upper()
     
-    # Case swapping based on input lengths
-    swapped1 = ''.join(c.swapcase() for c in input_string1)
+    # Handcraft the swapped case for the first string
+    swapped1 = ""
+    for i, c in enumerate(input_string1):
+        swapped1 += c.swapcase()
     
+    # Case swapping based on input lengths
     if len(input_string1) < len(input_string2):
         return input_string1.upper() + input_string2
     elif len(input_string1) > len(input_string2):
