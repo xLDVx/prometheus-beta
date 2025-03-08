@@ -20,7 +20,7 @@ def test_max_sum_increasing_subsequence_complex_scenarios():
 
 def test_max_sum_increasing_subsequence_mixed_numbers():
     """Test scenarios with mixed positive and negative numbers."""
-    assert max_sum_increasing_subsequence([-2, 1, -3, 4, -1, 2, 1, -5, 4]) == 6
+    assert max_sum_increasing_subsequence([-2, 1, -3, 4, -1, 2, 1, -5, 4]) == 7
     assert max_sum_increasing_subsequence([1, -1, 2, -2, 3]) == 4
 
 def test_input_types():
