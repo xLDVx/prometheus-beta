@@ -20,10 +20,10 @@ def test_complex_cases():
 
 def test_unicode_and_special_characters():
     """Test with Unicode and special characters."""
-    assert longest_nonrepeating_substring("안녕하세요") == 6  # Korean characters
+    assert longest_nonrepeating_substring("안녕하세요") == 5  # Korean characters
     assert longest_nonrepeating_substring("!@#$%^&*()") == 10  # Special characters
 
 def test_whitespace_cases():
     """Test cases involving whitespace characters."""
-    assert longest_nonrepeating_substring("a b c d") == 7   # Spaces between unique characters
+    assert longest_nonrepeating_substring("a b c d") == 3   # Spaces between unique characters
     assert longest_nonrepeating_substring(" ") == 1         # Single space
