@@ -16,6 +16,13 @@ def switch_cases(input_string1, input_string2):
     if not (isinstance(input_string1, str) and isinstance(input_string2, str)):
         raise TypeError("Both inputs must be strings")
 
-    # Convert string1 to swapped case, string2 to preserved case
-    return ''.join(c.swapcase() if i < len(input_string1) else c 
-                   for i, c in enumerate(input_string1 + input_string2))
+    # Special case: if first string is empty, uppercase second string 
+    if not input_string1:
+        return input_string2.upper()
+    
+    # Special case: if second string is empty, swap case of first string
+    if not input_string2:
+        return input_string1.swapcase()
+
+    # Swap case of first string, uppercase second string
+    return input_string1.swapcase() + input_string2.upper()
