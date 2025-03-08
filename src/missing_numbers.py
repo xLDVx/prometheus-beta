@@ -18,29 +18,24 @@ def find_missing_numbers(arr):
     # Determine sorting direction
     is_ascending = arr[0] <= arr[-1]
     
-    # Normalize to ascending order for consistent processing
-    original_arr = arr
+    # If descending, work with the sorted ascending version
     if not is_ascending:
-        arr = sorted(arr, reverse=True)
-    
-    # Find the range of numbers
-    min_val = 1
-    max_val = arr[-1]
-    
-    # If only one element, generate missing numbers before it
-    if len(arr) == 1:
-        missing = list(range(1, arr[0]))
+        sorted_arr = sorted(arr)
     else:
-        # Create a set of the input array for efficient lookup
-        num_set = set(arr)
-        
-        # Find missing numbers
-        missing = [
-            num for num in range(min_val, max_val + 1) 
-            if num not in num_set
-        ]
+        sorted_arr = arr
     
-    # If originally descending, return in descending order
-    if len(original_arr) > 1 and original_arr[0] > original_arr[-1]:
-        return list(reversed(missing))
-    return missing
+    # Create a set of the input array for efficient lookup
+    num_set = set(sorted_arr)
+    
+    # Determine min and max
+    min_val = 1
+    max_val = sorted_arr[-1]
+    
+    # Find missing numbers
+    missing = [
+        num for num in range(min_val, max_val + 1) 
+        if num not in num_set
+    ]
+    
+    # Return in original order
+    return sorted(missing, reverse=not is_ascending)
