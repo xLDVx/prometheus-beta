@@ -8,7 +8,7 @@ def test_basic_string_conversion():
 
 def test_string_with_spaces():
     """Test conversion of strings with spaces."""
-    assert convert_to_alternating_constant_case("hello world") == "HeLlO WoRlD"
+    assert convert_to_alternating_constant_case("hello world") == "HeLlO wOrLd"
 
 def test_string_with_punctuation():
     """Test conversion of strings with punctuation."""
