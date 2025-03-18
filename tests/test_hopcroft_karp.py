@@ -60,7 +60,8 @@ def test_no_perfect_matching():
     hk = HopcroftKarp(graph)
     matching = hk.maximum_matching()
     
-    assert len(matching) == 4  # 1-2 match, 3 unmatched
+    # Validate that the maximum matching is correct
+    assert len(matching) == 2  # 1-2 match, 3 remains unmatched
     assert matching.get(1) == 2
     assert matching.get(2) == 1
 
