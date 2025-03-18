@@ -33,10 +33,9 @@ def find_palindrome_pairs(words):
             if i == j:
                 continue
             
-            # Check different concatenation orders
-            if is_palindrome(words[i] + words[j]):
-                # Check for valid indices and unique pairs
-                if [i, j] not in palindrome_pairs:
-                    palindrome_pairs.append([i, j])
+            # Check if concatenation forms a palindrome
+            concatenated = words[i] + words[j]
+            if is_palindrome(concatenated):
+                palindrome_pairs.append([i, j])
     
     return palindrome_pairs
