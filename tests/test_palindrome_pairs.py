@@ -5,7 +5,10 @@ def test_basic_palindrome_pairs():
     """Test basic palindrome pairs scenario."""
     words = ["abcd", "dcba", "lls", "s", "sssll"]
     result = find_palindrome_pairs(words)
-    assert sorted(result) == sorted([[0, 1], [1, 0], [3, 4], [4, 3]])
+    expected_pairs = [[0, 1], [1, 0], [3, 4], [4, 3]]
+    
+    # Convert result to sorted list for comparison
+    assert sorted(map(list, result)) == sorted(expected_pairs)
 
 def test_empty_input():
     """Test handling of empty input."""
@@ -26,13 +29,19 @@ def test_multiple_palindrome_pairs():
     """Test scenario with multiple palindrome pairs."""
     words = ["bat", "tab", "cat"]
     result = find_palindrome_pairs(words)
-    assert sorted(result) == sorted([[0, 1], [1, 0]])
+    expected_pairs = [[0, 1], [1, 0]]
+    
+    # Convert result to sorted list for comparison
+    assert sorted(map(list, result)) == sorted(expected_pairs)
 
 def test_short_and_long_words():
     """Test combining short and long words."""
     words = ["a", "abc", "aba"]
     result = find_palindrome_pairs(words)
-    assert sorted(result) == sorted([[1, 2], [2, 1]])
+    expected_pairs = [[1, 2], [2, 1]]
+    
+    # Convert result to sorted list for comparison
+    assert sorted(map(list, result)) == sorted(expected_pairs)
 
 def test_self_palindrome():
     """Test words that are self-palindromes."""
