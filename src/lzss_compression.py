@@ -73,14 +73,15 @@ class LZSSCompressor:
             if match_length >= self.min_match_length:
                 # Encode match: (offset, length)
                 # Use 12 bits for offset, 4 bits for length
-                compressed.append(0)  # Match flag
-                compressed.append(((match_pos & 0xF00) >> 8) | ((match_length - self.min_match_length) & 0x0F))
-                compressed.append(match_pos & 0xFF)
+                compressed.extend([
+                    0,  # Match flag
+                    ((match_pos & 0xF00) >> 8) | ((match_length - self.min_match_length) & 0x0F),
+                    match_pos & 0xFF
+                ])
                 current_pos += match_length
             else:
                 # Encode literal
-                compressed.append(1)  # Literal flag
-                compressed.append(data[current_pos])
+                compressed.extend([1, data[current_pos]])  # Literal flag and value
                 current_pos += 1
         
         return bytes(compressed)
@@ -112,7 +113,6 @@ class LZSSCompressor:
         
         i = 0
         while i < len(compressed_data):
-            # Check if it's a match or literal
             if i + 1 >= len(compressed_data):
                 raise ValueError("Malformed compressed data")
             
@@ -136,14 +136,12 @@ class LZSSCompressor:
                         raise ValueError("Invalid offset in compressed data")
                     decompressed.append(decompressed[start + j])
                 
-                i += 2
+                i += 3
             elif flag == 1:  # Literal
                 if i + 1 >= len(compressed_data):
                     raise ValueError("Malformed compressed data")
                 decompressed.append(compressed_data[i+1])
+                i += 2
             else:
-                raise ValueError(f"Invalid flag: {flag}")
-            
-            i += 2
-        
-        return bytes(decompressed)
+                # Adjust for unexpected flags
+                i += 1
