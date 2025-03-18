@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Union
 
 class HopcroftKarp:
     """
@@ -8,13 +8,17 @@ class HopcroftKarp:
     Time complexity: O(E * sqrt(V)), where E is the number of edges and V is the number of vertices.
     """
     
-    def __init__(self, graph: Dict[int, List[int]]):
+    def __init__(self, graph: Union[Dict[int, List[int]], None]):
         """
         Initialize the Hopcroft-Karp algorithm with a bipartite graph.
         
         :param graph: A dictionary representing the bipartite graph where keys are vertices 
                       from the left set and values are lists of adjacent vertices from the right set.
+        :raises TypeError: If graph is not a dictionary or None
         """
+        if graph is None or not isinstance(graph, dict):
+            raise TypeError("Graph must be a non-None dictionary")
+        
         self.graph = graph
         self.match = {}  # Matching dictionary
         self.dist = {}   # Distance dictionary for BFS
@@ -46,7 +50,7 @@ class HopcroftKarp:
                     # Consider unmatched or matched vertices in right set
                     w = self.match.get(v)
                     
-                    if self.dist[w] == float('inf'):
+                    if self.dist.get(w, float('inf')) == float('inf'):
                         self.dist[w] = self.dist[u] + 1
                         queue.append(w)
         
@@ -66,7 +70,7 @@ class HopcroftKarp:
                 
                 # If no path exists or can extend an existing path
                 if (w is None or 
-                    (self.dist[w] == self.dist[u] + 1 and self.dfs(w))):
+                    (self.dist.get(w, float('inf')) == self.dist[u] + 1 and self.dfs(w))):
                     self.match[v] = u
                     self.match[u] = v
                     return True
