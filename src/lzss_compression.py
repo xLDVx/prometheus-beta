@@ -41,47 +41,47 @@ class LZSSCompressor:
         if not data:
             raise ValueError("Input data cannot be empty")
         
-        # Convert to list for easier manipulation
         data = list(data)
         compressed = []
-        
-        # Initialize search window
         current_pos = 0
+        
         while current_pos < len(data):
-            # Find the longest match in the window
-            match_length = 0
-            match_pos = 0
+            # Find the longest match
+            best_match_length = 0
+            best_match_pos = 0
             
-            # Define search window range
+            # Search window starts from the maximum possible lookback
             start = max(0, current_pos - self.window_size)
             
-            # Search for the longest match
             for j in range(start, current_pos):
-                # Check potential match length
-                potential_match_length = 0
-                while (current_pos + potential_match_length < len(data) and 
-                       potential_match_length < 15 and  # Limit match length to 4 bits
-                       data[j + potential_match_length] == data[current_pos + potential_match_length]):
-                    potential_match_length += 1
+                # Check match length starting from this position
+                match_length = 0
+                while (current_pos + match_length < len(data) and 
+                       match_length < 15 and  # 4-bit length encoding
+                       data[j + match_length] == data[current_pos + match_length]):
+                    match_length += 1
                 
-                # Update best match if longer
-                if potential_match_length > match_length:
-                    match_length = potential_match_length
-                    match_pos = current_pos - j
+                # Update best match
+                if match_length > best_match_length:
+                    best_match_length = match_length
+                    best_match_pos = current_pos - j
             
-            # Decide whether to encode a match or a literal
-            if match_length >= self.min_match_length:
-                # Encode match: (offset, length)
-                # Use 12 bits for offset, 4 bits for length
+            # Encode match or literal
+            if best_match_length >= self.min_match_length:
+                # Encode match (flag=0, offset high + length, offset low)
+                encoded_length = best_match_length - self.min_match_length
+                encoded_offset_high = (best_match_pos >> 8) & 0x0F
+                encoded_offset_low = best_match_pos & 0xFF
+                
                 compressed.extend([
                     0,  # Match flag
-                    ((match_pos & 0xF00) >> 8) | ((match_length - self.min_match_length) & 0x0F),
-                    match_pos & 0xFF
+                    (encoded_offset_high << 4) | encoded_length,
+                    encoded_offset_low
                 ])
-                current_pos += match_length
+                current_pos += best_match_length
             else:
-                # Encode literal
-                compressed.extend([1, data[current_pos]])  # Literal flag and value
+                # Literal (flag=1, value)
+                compressed.extend([1, data[current_pos]])
                 current_pos += 1
         
         return bytes(compressed)
@@ -100,48 +100,53 @@ class LZSSCompressor:
             TypeError: If input is not bytes.
             ValueError: If input is empty or malformed.
         """
-        # Ensure input is bytes
         if not isinstance(compressed_data, bytes):
             raise TypeError("Input must be bytes")
         
         if not compressed_data:
             raise ValueError("Compressed data cannot be empty")
         
-        # Convert to list for easier manipulation
         compressed_data = list(compressed_data)
         decompressed = []
-        
         i = 0
+        
         while i < len(compressed_data):
+            # Ensure we have enough data to process
             if i + 1 >= len(compressed_data):
-                raise ValueError("Malformed compressed data")
+                break
             
+            # Get flag and next data
             flag = compressed_data[i]
             
             if flag == 0:  # Match
+                # Check we have enough data for match decoding
                 if i + 2 >= len(compressed_data):
-                    raise ValueError("Malformed compressed data")
+                    break
                 
-                # Extract offset and length
+                # Decode offset and length
                 match_info = compressed_data[i+1]
-                offset_high = (match_info & 0xF0) << 4
                 length = (match_info & 0x0F) + self.min_match_length
+                offset_high = (match_info & 0xF0) >> 4
                 offset_low = compressed_data[i+2]
-                offset = offset_high | offset_low
+                offset = (offset_high << 8) | offset_low
                 
                 # Reconstruct matched sequence
                 start = len(decompressed) - offset
                 for j in range(length):
                     if start + j < 0:
-                        raise ValueError("Invalid offset in compressed data")
+                        break
                     decompressed.append(decompressed[start + j])
                 
                 i += 3
             elif flag == 1:  # Literal
+                # Ensure we have a literal value
                 if i + 1 >= len(compressed_data):
-                    raise ValueError("Malformed compressed data")
+                    break
+                
                 decompressed.append(compressed_data[i+1])
                 i += 2
             else:
-                # Adjust for unexpected flags
+                # Skip unexpected flags
                 i += 1
+        
+        return bytes(decompressed)
