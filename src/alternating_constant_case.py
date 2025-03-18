@@ -3,8 +3,9 @@ def convert_to_alternating_constant_case(input_string):
     Convert a string to alternating constant case.
     
     This function takes a string and converts it so that:
-    - Every even-indexed character is converted to UPPERCASE
-    - Every odd-indexed character is converted to lowercase
+    - Every even-indexed character (0, 2, 4...) is converted to UPPERCASE
+    - Every odd-indexed character (1, 3, 5...) is converted to lowercase
+    - Applies case conversion only to alphabetic characters
     - Non-alphabetic characters remain unchanged
     
     Args:
@@ -33,11 +34,16 @@ def convert_to_alternating_constant_case(input_string):
     # Convert to alternating case
     result = []
     for i, char in enumerate(input_string):
-        if i % 2 == 0:
-            # Even indices (0, 2, 4...) to UPPERCASE
-            result.append(char.upper())
+        if char.isalpha():
+            # Apply case to alphabetic characters
+            if i % 2 == 0:
+                # Even indices (0, 2, 4...) to UPPERCASE
+                result.append(char.upper())
+            else:
+                # Odd indices (1, 3, 5...) to lowercase
+                result.append(char.lower())
         else:
-            # Odd indices (1, 3, 5...) to lowercase
-            result.append(char.lower())
+            # Non-alphabetic characters unchanged
+            result.append(char)
     
     return ''.join(result)
