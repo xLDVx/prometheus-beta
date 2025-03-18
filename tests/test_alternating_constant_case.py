@@ -12,7 +12,7 @@ def test_string_with_spaces():
 
 def test_string_with_punctuation():
     """Test conversion of strings with punctuation."""
-    assert convert_to_alternating_constant_case("hello, world!") == "HeLlO, WoRlD!"
+    assert convert_to_alternating_constant_case("hello, world!") == "HeLlO, wOrLd!"
 
 def test_empty_string():
     """Test conversion of an empty string."""
