@@ -55,4 +55,4 @@ def fibonacci_sum(numbers):
     
     # Generate Fibonacci sequence and calculate sum
     fib_seq = fibonacci(max_num)
-    return sum(fib_seq)
+    return sum(set(fib_seq))
