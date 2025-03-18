@@ -20,7 +20,7 @@ def find_palindrome_pairs(words):
         return s == s[::-1]
     
     # Input validation
-    if not words or not isinstance(words, list):
+    if not words or not isinstance(words, list) or len(words) < 2:
         return []
     
     # Result to store palindrome pairs
@@ -33,8 +33,8 @@ def find_palindrome_pairs(words):
             if i == j:
                 continue
             
-            # Check both concatenation orders
-            if is_palindrome(words[i] + words[j]):
+            # Check if concatenation forms a palindrome
+            if words[i] and words[j] and is_palindrome(words[i] + words[j]):
                 # Avoid duplicate pairs
                 if [i, j] not in palindrome_pairs:
                     palindrome_pairs.append([i, j])
