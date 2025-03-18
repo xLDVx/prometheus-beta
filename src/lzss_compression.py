@@ -148,3 +148,5 @@ class LZSSCompressor:
             else:
                 # Invalid flag
                 raise ValueError(f"Invalid flag: {flag}")
+        
+        return bytes(decompressed)
