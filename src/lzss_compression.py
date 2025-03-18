@@ -111,9 +111,9 @@ class LZSSCompressor:
         i = 0
         
         while i < len(compressed_data):
-            # Ensure we have enough data to process
+            # Ensure we have enough data to process complete tokens
             if i + 1 >= len(compressed_data):
-                break
+                raise ValueError("Malformed compressed data")
             
             # Get flag and next data
             flag = compressed_data[i]
@@ -121,7 +121,7 @@ class LZSSCompressor:
             if flag == 0:  # Match
                 # Check we have enough data for match decoding
                 if i + 2 >= len(compressed_data):
-                    break
+                    raise ValueError("Malformed compressed data")
                 
                 # Decode offset and length
                 match_info = compressed_data[i+1]
@@ -134,19 +134,17 @@ class LZSSCompressor:
                 start = len(decompressed) - offset
                 for j in range(length):
                     if start + j < 0:
-                        break
+                        raise ValueError("Invalid offset in compressed data")
                     decompressed.append(decompressed[start + j])
                 
                 i += 3
             elif flag == 1:  # Literal
                 # Ensure we have a literal value
                 if i + 1 >= len(compressed_data):
-                    break
+                    raise ValueError("Malformed compressed data")
                 
                 decompressed.append(compressed_data[i+1])
                 i += 2
             else:
-                # Skip unexpected flags
-                i += 1
-        
-        return bytes(decompressed)
+                # Invalid flag
+                raise ValueError(f"Invalid flag: {flag}")
