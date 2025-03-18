@@ -34,4 +34,4 @@ def test_fibonacci_sum_edge_cases():
 def test_fibonacci_sum_multiple_inputs():
     """Test Fibonacci sum with multiple inputs"""
     assert fibonacci_sum([3, 7, 10]) == 19  # Fibonacci up to 10
-    assert fibonacci_sum([100]) == 34  # Fibonacci up to 100
+    assert fibonacci_sum([100]) == 231  # Fibonacci up to 100
