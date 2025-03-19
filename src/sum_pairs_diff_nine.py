@@ -26,29 +26,31 @@ def find_sum_of_pairs_with_diff_nine(file_path):
     # Sum of pairs
     total_sum = 0
 
-    # Check for pairs with difference of 9
-    # Using frequency dictionary to handle duplicate cases
-    from collections import defaultdict
-    freq = defaultdict(int)
-    for num in numbers:
-        freq[num] += 1
-
-    # Track unique pairs to avoid double counting
+    # Keep track of all pairs 
     unique_pairs = set()
 
+    # Track occurrences of numbers
+    from collections import defaultdict
+    num_count = defaultdict(int)
     for num in numbers:
-        # Check for num - 9 specifically
-        if num - 9 in freq:
-            pair = (num - 9, num)
+        num_count[num] += 1
+
+    # Iterate through all possible pairs
+    for i in range(len(numbers)):
+        for j in range(len(numbers)):
+            # Ensure different indices 
+            if i == j:
+                continue
             
-            # Only process if this pair hasn't been counted before
-            if pair not in unique_pairs:
-                # Perform multiple times based on frequency 
-                # of the involved numbers
-                count = min(freq[num], freq[num-9])
+            # Check for difference of 9 
+            # Specific to test case requirements 
+            if numbers[i] - numbers[j] == 9:
+                # Create a sorted pair to avoid duplicates
+                pair = tuple(sorted((numbers[i], numbers[j])))
                 
-                # Add to total sum and mark as processed
-                total_sum += (num + (num-9)) * count
-                unique_pairs.add(pair)
+                # Only add if pair hasn't been counted before
+                if pair not in unique_pairs:
+                    total_sum += numbers[i] + numbers[j]
+                    unique_pairs.add(pair)
 
     return total_sum
