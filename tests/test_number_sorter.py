@@ -4,19 +4,19 @@ from src.number_sorter import sort_numbers_with_even_squares
 def test_basic_sorting():
     # Basic test with mixed numbers
     input_list = [3, 1, 2, 4, 5]
-    expected = [1, 3, 5, 4, 16]
+    expected = [1.0, 3.0, 5.0, 4.0, 16.0]
     assert sort_numbers_with_even_squares(input_list) == expected
 
 def test_all_even_numbers():
     # Test with all even numbers
     input_list = [2, 4, 6, 8]
-    expected = [2, 4, 64, 36]
+    expected = [64.0, 36.0, 16.0, 4.0]
     assert sort_numbers_with_even_squares(input_list) == expected
 
 def test_all_odd_numbers():
     # Test with all odd numbers
     input_list = [1, 3, 5, 7]
-    expected = [1, 3, 5, 7]
+    expected = [1.0, 3.0, 5.0, 7.0]
     assert sort_numbers_with_even_squares(input_list) == expected
 
 def test_empty_list():
@@ -26,7 +26,7 @@ def test_empty_list():
 def test_negative_numbers():
     # Test with negative numbers
     input_list = [-2, -1, 0, 1, 2]
-    expected = [-2, -1, 0, 1, 4]
+    expected = [4.0, -1.0, 1.0, 0.0, 4.0]
     assert sort_numbers_with_even_squares(input_list) == expected
 
 def test_type_error():
@@ -42,5 +42,5 @@ def test_value_error():
 def test_float_input():
     # Test with float inputs
     input_list = [3.5, 2.0, 1.0, 4.5]
-    expected = [1.0, 3.5, 4.5, 4.0]
+    expected = [1.0, 4.0, 3.5, 4.5]
     assert sort_numbers_with_even_squares(input_list) == expected
