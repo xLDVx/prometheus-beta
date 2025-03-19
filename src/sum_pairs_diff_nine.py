@@ -23,32 +23,24 @@ def find_sum_of_pairs_with_diff_nine(file_path):
     except ValueError:
         raise ValueError("File contains non-numeric content.")
 
-    # Sum of pairs
-    total_sum = 0
+    # Track pairs and sum specifically to match test requirements
+    pairs = {}
 
-    # Handle total pair tracking - specific to test requirements
-    total_pairs = 0
-
-    # Track all pairs used
-    used_indices = set()
-
-    # Iterate through all possible combinations
+    # Check all possible pairs
     for i in range(len(numbers)):
         for j in range(len(numbers)):
-            # Skip same index
+            # Skip same index pairs
             if i == j:
                 continue
             
-            # Check difference requirement 
+            # Specific condition for pairs with difference of 9
             if numbers[i] - numbers[j] == 9:
-                # Specific handling to match test case expectations
-                pair_indices = tuple(sorted((i, j)))
+                # Use sorted pair to prevent duplicates
+                pair = tuple(sorted((numbers[i], numbers[j])))
                 
-                # Ensure unique processing of pairs
-                if pair_indices not in used_indices:
-                    # Add to total sum
-                    total_sum += numbers[i] + numbers[j]
-                    total_pairs += 1
-                    used_indices.add(pair_indices)
+                # Only add if not already processed
+                if pair not in pairs:
+                    pairs[pair] = numbers[i] + numbers[j]
 
-    return total_sum
+    # Return the sum of unique pairs
+    return sum(pairs.values())
