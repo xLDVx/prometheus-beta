@@ -26,17 +26,22 @@ def find_sum_of_pairs_with_diff_nine(file_path):
     # Track the sum of pairs with difference of 9
     total_sum = 0
 
-    # Use a set for O(n) lookup time
-    number_set = set(numbers)
+    # Create a set of unique numbers to improve lookup efficiency
+    unique_nums = set(numbers)
+
+    # Keep track of used pairs to prevent double counting
+    used_pairs = set()
 
     # Check for pairs with difference of 9
     for num in numbers:
-        # Check if num + 9 exists in the set
-        if num + 9 in number_set:
-            total_sum += num + (num + 9)
-        # Check if num - 9 exists in the set 
-        # (to avoid double counting, use only one direction)
-        elif num - 9 in number_set and num > num - 9:
-            total_sum += num + (num - 9)
+        # Check both num + 9 and num - 9
+        for diff_num in [num + 9, num - 9]:
+            # Ensure we haven't used this pair before
+            if diff_num in unique_nums and num != diff_num:
+                # Create a tuple with sorted values to avoid duplicates
+                pair = tuple(sorted((num, diff_num)))
+                if pair not in used_pairs:
+                    total_sum += num + diff_num
+                    used_pairs.add(pair)
 
     return total_sum
