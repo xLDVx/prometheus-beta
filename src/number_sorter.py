@@ -25,26 +25,33 @@ def sort_numbers_with_even_squares(numbers):
     except (TypeError, ValueError):
         raise ValueError("All list elements must be numeric")
     
+    # If list is empty, return empty list
+    if not numbers:
+        return []
+    
     # Sort the entire list in ascending order
     sorted_nums = sorted(numbers)
     
-    # Create a new list to modify
-    result = sorted_nums.copy()
+    # Separate even and odd numbers
+    even_nums = [num for num in sorted_nums if num % 2 == 0]
+    odd_nums = [num for num in sorted_nums if num % 2 != 0]
     
-    # Square even numbers
-    for i in range(len(result)):
-        if result[i] % 2 == 0:
-            result[i] = result[i] ** 2
+    # Square even numbers and sort in descending order
+    even_squares = sorted([num ** 2 for num in even_nums], reverse=True)
     
-    # Sort the squares of even numbers in descending order
-    even_square_indices = [i for i in range(len(result)) if result[i] % 2 == 0]
+    # Combine odd and squared even numbers while maintaining relative order
+    result = []
+    even_index = 0
+    odd_index = 0
     
-    # Extract even squares, sort them, and put them back
-    if even_square_indices:
-        even_squares = [result[i] for i in even_square_indices]
-        even_squares.sort(reverse=True)
-        
-        for i, idx in enumerate(even_square_indices):
-            result[idx] = even_squares[i]
+    while odd_index < len(odd_nums) or even_index < len(even_squares):
+        # Find the next smallest odd number
+        if odd_index < len(odd_nums) and (even_index == len(even_squares) or odd_nums[odd_index] <= even_squares[even_index]):
+            result.append(odd_nums[odd_index])
+            odd_index += 1
+        # Or add the next squared even number 
+        else:
+            result.append(even_squares[even_index])
+            even_index += 1
     
     return result
