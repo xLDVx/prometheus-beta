@@ -25,12 +25,18 @@ def fibonacci_sum_constraint(n: int, k: int) -> list:
     # Initialize the sequence
     sequence = []
 
-    # Start with the first two numbers that satisfy the constraint
+    # Try to find a valid starting sequence
+    max_attempts = k * 10  # Prevent infinite loops
+    attempt = 0
+    
     for first in range(k, k * 2):
         for second in range(first, k * 2):
+            attempt += 1
             if first + second >= k:
                 sequence = [first, second]
                 break
+            if attempt > max_attempts:
+                raise ValueError("Unable to generate a sequence satisfying the constraints")
         if sequence:
             break
 
@@ -44,5 +50,9 @@ def fibonacci_sum_constraint(n: int, k: int) -> list:
         if sequence[-1] + next_num < k:
             break
         sequence.append(next_num)
+
+    # Ensure the sequence meets the constraints
+    if not sequence or any(sequence[i] + sequence[i+1] < k for i in range(len(sequence)-1)):
+        raise ValueError("Unable to generate a sequence satisfying the constraints")
 
     return sequence
