@@ -24,6 +24,10 @@ def find_shortest_path(grid: List[List[int]]) -> int:
     if any(len(row) != n for row in grid):
         raise ValueError("Grid must be a square NxN matrix")
     
+    # Check if start or end is blocked
+    if grid[0][0] == 1 or grid[n-1][n-1] == 1:
+        return -1
+    
     # Possible movement directions: right, down, left, up
     directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
     
