@@ -43,8 +43,8 @@ def test_invalid_k():
 
 def test_impossible_sequence():
     # Test a case where no sequence can be generated
-    with pytest.raises(ValueError):
-        fibonacci_sum_constraint(5, 1000000)
+    with pytest.raises(ValueError, match="Unable to generate"):
+        fibonacci_sum_constraint(5, 10**9)
 
 def test_consecutive_sum_constraint():
     # Ensure consecutive elements satisfy the sum constraint
