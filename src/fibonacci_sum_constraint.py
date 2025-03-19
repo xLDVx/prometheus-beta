@@ -20,28 +20,33 @@ def fibonacci_sum_constraint(n: int, k: int) -> list:
 
     # Special case: if n is 1, return any valid first number
     if n == 1:
-        return [k]
+        return [max(1, k)]
+
+    # Absolute maximum value to prevent infinite loops
+    MAX_VAL = 10**6
 
     # Try to generate a sequence with an upper limit to prevent infinite loops
-    for start_val in range(1, k * 10):
+    for start_val in range(1, min(k * 10, MAX_VAL)):
         sequence = []
         
         # Try to find initial numbers that satisfy the constraint
-        for first in range(start_val, start_val + k):
-            for second in range(first, first + k):
+        found_valid_start = False
+        for first in range(start_val, min(start_val + k, MAX_VAL)):
+            for second in range(first, min(first + k, MAX_VAL)):
                 if first + second >= k:
                     sequence = [first, second]
+                    found_valid_start = True
                     break
-            if sequence:
+            if found_valid_start:
                 break
         
-        if not sequence:
+        if not found_valid_start:
             continue
 
         # Generate the rest of the sequence
         while len(sequence) < n:
             next_num = sequence[-1] + sequence[-2]
-            if sequence[-1] + next_num < k:
+            if next_num > MAX_VAL or sequence[-1] + next_num < k:
                 break
             sequence.append(next_num)
 
