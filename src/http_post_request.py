@@ -21,6 +21,7 @@ def send_http_post_request(
 
     Raises:
         ValueError: If the URL is empty or invalid.
+        requests.exceptions.HTTPError: For HTTP error responses.
         requests.RequestException: For network-related errors.
     """
     # Validate URL
@@ -31,25 +32,20 @@ def send_http_post_request(
     data = data or {}
     headers = headers or {}
 
-    try:
-        # Send the POST request
-        response = requests.post(
-            url, 
-            json=data, 
-            headers=headers, 
-            timeout=timeout
-        )
+    # Send the POST request
+    response = requests.post(
+        url, 
+        json=data, 
+        headers=headers, 
+        timeout=timeout
+    )
 
-        # Raise an exception for HTTP error responses
-        response.raise_for_status()
+    # Raise an exception for HTTP error responses
+    response.raise_for_status()
 
-        # Return response as dictionary
-        return {
-            'status_code': response.status_code,
-            'json': response.json() if response.content else {},
-            'headers': dict(response.headers)
-        }
-
-    except requests.exceptions.RequestException as e:
-        # Handle various request-related exceptions
-        raise RuntimeError(f"HTTP POST request failed: {str(e)}")
+    # Return response as dictionary
+    return {
+        'status_code': response.status_code,
+        'json': response.json() if response.content else {},
+        'headers': dict(response.headers)
+    }
