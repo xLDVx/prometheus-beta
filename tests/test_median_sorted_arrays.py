@@ -30,7 +30,7 @@ def test_different_array_sizes():
 
 def test_negative_numbers():
     """Test median with negative numbers"""
-    assert find_median_sorted_arrays([-5, -3, -1], [-2, 0, 2]) == -1
+    assert find_median_sorted_arrays([-5, -3, -1], [-2, 0, 2]) == -1.5
 
 def test_float_numbers():
     """Test median with floating point numbers"""
