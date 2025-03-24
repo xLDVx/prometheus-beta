@@ -57,7 +57,7 @@ def test_request_exception_handling():
         # Simulate a request exception
         mock_post.side_effect = requests.exceptions.ConnectionError("Connection failed")
 
-        with pytest.raises(RuntimeError, match="HTTP POST request failed"):
+        with pytest.raises(requests.exceptions.ConnectionError, match="Connection failed"):
             send_http_post_request('https://example.com/api')
 
 def test_http_error_handling():
