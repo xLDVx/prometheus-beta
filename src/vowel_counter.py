@@ -19,8 +19,8 @@ def count_vowels_and_consonants(text: str) -> dict:
     # Convert to lowercase for consistent counting
     text = text.lower()
 
-    # Define vowels
-    vowels = set('aeiou')
+    # Define vowels (including accented vowels)
+    vowels = set('aeiouáéíóúäëïöüâêîôû')
 
     # Initialize counters
     vowel_count = 0
