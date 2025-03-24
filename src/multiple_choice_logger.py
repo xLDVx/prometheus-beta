@@ -1,5 +1,6 @@
 import json
 import os
+import time
 from typing import List, Dict, Any
 
 class MultipleChoiceLogger:
@@ -68,12 +69,12 @@ class MultipleChoiceLogger:
             if response not in valid_options:
                 raise ValueError(f"Invalid response. Must be one of {valid_options}")
         
-        # Prepare log entry
+        # Prepare log entry with current timestamp
         log_entry = {
             "question_id": question_id,
             "user_id": user_id,
             "response": response,
-            "timestamp": os.path.getctime
+            "timestamp": time.time()
         }
         
         # Generate log filename
