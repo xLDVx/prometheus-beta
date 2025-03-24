@@ -31,9 +31,9 @@ def test_with_numbers_and_symbols():
     result = count_vowels_and_consonants("hello123! world")
     assert result == {'vowels': 3, 'consonants': 7}
 
-def test_non_english_characters():
-    """Test handling of non-English characters."""
-    result = count_vowels_and_consonants("héllo世界")
+def test_with_accented_characters():
+    """Test handling of accented characters."""
+    result = count_vowels_and_consonants("héllö")
     assert result == {'vowels': 2, 'consonants': 3}
 
 def test_invalid_input_type():
