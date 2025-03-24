@@ -14,7 +14,7 @@ def find_median_sorted_arrays(nums1, nums2):
     
     Raises:
         TypeError: If inputs are not lists
-        ValueError: If input lists contain non-numeric elements
+        ValueError: If input lists contain non-numeric elements or are unsorted
     """
     # Type checking
     if not isinstance(nums1, list) or not isinstance(nums2, list):
@@ -23,6 +23,11 @@ def find_median_sorted_arrays(nums1, nums2):
     # Validate input contains only numbers
     if not all(isinstance(x, (int, float)) for x in nums1 + nums2):
         raise ValueError("Lists must contain only numeric values")
+    
+    # Check if arrays are sorted
+    if not (all(nums1[i] <= nums1[i+1] for i in range(len(nums1)-1)) and 
+            all(nums2[i] <= nums2[i+1] for i in range(len(nums2)-1))):
+        raise ValueError("Input arrays must be sorted")
     
     # Ensure nums1 is the smaller array to optimize binary search
     if len(nums1) > len(nums2):
@@ -58,5 +63,5 @@ def find_median_sorted_arrays(nums1, nums2):
         else:
             left = partitionX + 1
     
-    # If no valid partition found
-    raise ValueError("Input arrays are not sorted")
+    # If no valid partition found (should not reach here due to earlier checks)
+    raise ValueError("Unable to find median")
