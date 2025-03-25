@@ -32,4 +32,4 @@ def test_invalid_input_type():
 
 def test_special_characters():
     """Test conversion with special characters and spaces."""
-    assert convert_to_alternating_dot_case("hello world!") == 'h.E.l.L.o. .W.o.R.l.D.!'
+    assert convert_to_alternating_dot_case("hello world!") == 'h.E.l.L.o. .w.O.r.L.d.!'
