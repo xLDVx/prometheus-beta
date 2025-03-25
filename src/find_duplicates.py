@@ -19,19 +19,21 @@ def find_duplicates(numbers: List[int]) -> List[int]:
         >>> find_duplicates([])
         []
     """
-    # Use a set to track seen numbers and another to track duplicates
+    # Use sets to track seen and duplicated numbers
     seen = set()
     duplicates = set()
-
-    # Use a list to preserve the order of first duplicate appearances
+    
+    # Use a list to track the order of first duplicate appearances
     result = []
 
     for num in numbers:
-        # If the number is already in seen, add it to duplicates if not already there
+        # If number is already seen and not yet marked as a duplicate
         if num in seen and num not in duplicates:
+            # Add the first duplicate appearance in the correct order
             result.append(num)
             duplicates.add(num)
         else:
+            # Mark the number as seen
             seen.add(num)
 
     return result
