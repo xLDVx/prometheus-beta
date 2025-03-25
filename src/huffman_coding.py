@@ -48,7 +48,7 @@ def build_huffman_tree(freq_dict):
         char, freq = list(freq_dict.items())[0]
         root = HuffmanNode(char, freq)
         # If single character, add a dummy node to allow decoding
-        root.left = HuffmanNode(None, 1)
+        root.left = HuffmanNode(char, 1)
         return root
     
     # Create priority queue of nodes
@@ -154,36 +154,33 @@ def huffman_decode(encoded_data, huffman_tree):
     Raises:
         ValueError: If encoded data or Huffman tree is invalid
     """
-    if not encoded_data and len(encoded_data) == 0:
-        if huffman_tree.char is not None:
-            # Single character repetition case
-            return huffman_tree.char * len(encoded_data)
-        else:
-            raise ValueError("Encoded data and Huffman tree must be valid")
+    # Handle None cases
+    if huffman_tree is None:
+        raise ValueError("Huffman tree cannot be None")
     
-    if not huffman_tree:
-        raise ValueError("Huffman tree is invalid")
+    # Empty input
+    if not encoded_data:
+        return ""
     
     # Special case for single character
-    if huffman_tree.left and huffman_tree.left.char is not None and not huffman_tree.right:
-        # If tree represents single repeated character
+    if hasattr(huffman_tree, 'left') and huffman_tree.left and huffman_tree.left.char is not None:
         return huffman_tree.left.char * (len(encoded_data) // len('0'))
     
     decoded_data = []
     current_node = huffman_tree
     
-    for bit in encoded_data:
-        # Traverse down the tree based on the bit
-        if bit == '0':
-            current_node = current_node.left
-        else:
-            current_node = current_node.right
-        
-        # If we've reached a leaf node, we've found a character
-        if current_node.char is not None:
-            decoded_data.append(current_node.char)
-            # Reset to root for next character
-            current_node = huffman_tree
+    try:
+        for bit in encoded_data:
+            # Traverse down the tree based on the bit
+            current_node = current_node.left if bit == '0' else current_node.right
+            
+            # If we've reached a leaf node, we've found a character
+            if current_node.char is not None:
+                decoded_data.append(current_node.char)
+                # Reset to root for next character
+                current_node = huffman_tree
+    except AttributeError:
+        raise ValueError("Invalid Huffman tree or encoded data")
     
     # Ensure we've decoded the entire encoded data
     if current_node != huffman_tree:
