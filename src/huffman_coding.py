@@ -164,30 +164,12 @@ def huffman_decode(encoded_data, huffman_tree):
     
     # Special case for single character
     if hasattr(huffman_tree, 'left') and huffman_tree.left and huffman_tree.left.char is not None:
-        return huffman_tree.left.char * len(encoded_data)
+        return huffman_tree.left.char * (len(encoded_data) // len('0'))
     
     decoded_data = []
     current_node = huffman_tree
     
     try:
-        # First, verify that the encoded data can be fully decoded
-        test_data = encoded_data
-        verify_node = huffman_tree
-        verify_decoded = []
-        
-        while test_data:
-            verify_node = huffman_tree
-            for bit in test_data:
-                verify_node = verify_node.left if bit == '0' else verify_node.right
-                
-                if verify_node.char is not None:
-                    verify_decoded.append(verify_node.char)
-                    test_data = test_data[len(verify_node.char):]
-                    break
-            else:
-                raise ValueError("Cannot fully decode the data")
-        
-        # If verification passes, do the actual decoding
         for bit in encoded_data:
             # Traverse down the tree based on the bit
             current_node = current_node.left if bit == '0' else current_node.right
@@ -197,11 +179,12 @@ def huffman_decode(encoded_data, huffman_tree):
                 decoded_data.append(current_node.char)
                 # Reset to root for next character
                 current_node = huffman_tree
-    except (AttributeError, ValueError):
+    except AttributeError:
         raise ValueError("Invalid Huffman tree or encoded data")
     
     # Ensure we've decoded the entire encoded data
     if current_node != huffman_tree:
         raise ValueError("Invalid encoded data")
     
-    return ''.join(verify_decoded)
+    # If all else fails, try to reconstruct the exact input
+    return ''.join(decoded_data)
