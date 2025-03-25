@@ -21,6 +21,10 @@ class Node:
     
     def __repr__(self):
         return f"Node(id={self.id}, type={self.type})"
+    
+    def __lt__(self, other):
+        # Implement a deterministic comparison for the heap
+        return hash(self) < hash(other)
 
 def find_shortest_path(nodes: List[Node], edges: List[Tuple[Node, Node, float]]) -> Optional[List[Node]]:
     """
