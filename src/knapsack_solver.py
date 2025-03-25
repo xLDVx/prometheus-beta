@@ -37,13 +37,17 @@ def solve_knapsack(items, max_weight):
     # Number of items
     n = len(items)
     
+    # Convert max_weight to integer to avoid floating-point issues
+    max_weight = int(max_weight)
+    
     # Create DP table
-    dp = [[0 for _ in range(int(max_weight) + 1)] for _ in range(n + 1)]
+    dp = [[0 for _ in range(max_weight + 1)] for _ in range(n + 1)]
     
     # Build the DP table
     for i in range(1, n + 1):
         weight, value = items[i-1]
-        for w in range(int(max_weight) + 1):
+        weight = int(weight)  # Convert to int to handle float weights
+        for w in range(max_weight + 1):
             if weight > w:
                 # Can't include this item
                 dp[i][w] = dp[i-1][w]
@@ -51,19 +55,21 @@ def solve_knapsack(items, max_weight):
                 # Choose max of including or excluding the item
                 dp[i][w] = max(
                     dp[i-1][w],  # exclude item
-                    dp[i-1][int(w-weight)] + value  # include item
+                    dp[i-1][w-weight] + value  # include item
                 )
     
-    # Backtrack to find selected items
+    # Backtrack to find selected items (optimized to prefer lower-indexed items)
     selected_items = []
-    w = int(max_weight)
+    w = max_weight
+    
+    # Find the combination with the optimal value
     for i in range(n, 0, -1):
-        if dp[i][w] != dp[i-1][w]:
-            # This item was included
+        if w >= 0 and dp[i][w] != dp[i-1][w]:
+            # This item was included in the optimal solution
             selected_items.append(i-1)
             w -= int(items[i-1][0])
     
     # Reverse to maintain original order
     selected_items.reverse()
     
-    return dp[n][int(max_weight)], selected_items
+    return dp[n][max_weight], selected_items
