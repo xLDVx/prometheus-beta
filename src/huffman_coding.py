@@ -164,7 +164,7 @@ def huffman_decode(encoded_data, huffman_tree):
     
     # Special case for single character
     if hasattr(huffman_tree, 'left') and huffman_tree.left and huffman_tree.left.char is not None:
-        return huffman_tree.left.char * (len(encoded_data) // len('0'))
+        return huffman_tree.left.char * len(encoded_data)
     
     decoded_data = []
     current_node = huffman_tree
