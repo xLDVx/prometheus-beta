@@ -29,13 +29,6 @@ def huffman_encode(data):
     if not data:
         raise ValueError("Input data cannot be empty")
     
-    # Handle single character case with special handling
-    if len(set(data)) == 1:
-        # Create a special Huffman tree for single char repetition
-        root = HuffmanNode(data[0], len(data))
-        root.left = HuffmanNode(data[0], 1)  # Marker for single char
-        return '0' * len(data), root
-    
     # Build frequency dictionary
     freq_dict = dict(Counter(data))
     
@@ -71,10 +64,6 @@ def huffman_decode(encoded_data, huffman_tree):
     # Empty input
     if not encoded_data:
         return ""
-    
-    # Special case for single character repetition
-    if hasattr(huffman_tree, 'left') and huffman_tree.left and hasattr(huffman_tree.left, 'char'):
-        return huffman_tree.left.char * len(encoded_data)
     
     # Decode data 
     decoded_data = []
