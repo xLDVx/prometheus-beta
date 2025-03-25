@@ -131,54 +131,6 @@ class HuffmanCodec:
         encoded_data = ''.join(self.codes[char] for char in self.original_input)
         
         return encoded_data, self.huffman_tree
-    
-    def decode(self, encoded_data, huffman_tree):
-        """
-        Decode Huffman encoded data.
-        
-        Args:
-            encoded_data (str): Encoded binary string
-            huffman_tree (HuffmanNode): Huffman tree used for encoding
-        
-        Returns:
-            str: Decoded original data
-        
-        Raises:
-            ValueError: If encoded data or Huffman tree is invalid
-        """
-        # Handle None cases
-        if huffman_tree is None:
-            raise ValueError("Huffman tree cannot be None")
-        
-        # Empty input
-        if not encoded_data:
-            return ""
-        
-        # Special case for single character
-        if hasattr(huffman_tree, 'left') and huffman_tree.left and huffman_tree.left.char is not None:
-            return huffman_tree.left.char * (len(encoded_data) // len('0'))
-        
-        decoded_data = []
-        current_node = huffman_tree
-        
-        try:
-            for bit in encoded_data:
-                # Traverse down the tree based on the bit
-                current_node = current_node.left if bit == '0' else current_node.right
-                
-                # If we've reached a leaf node, we've found a character
-                if current_node.char is not None:
-                    decoded_data.append(current_node.char)
-                    # Reset to root for next character
-                    current_node = huffman_tree
-        except AttributeError:
-            raise ValueError("Invalid Huffman tree or encoded data")
-        
-        # Ensure we've decoded the entire encoded data
-        if current_node != huffman_tree:
-            raise ValueError("Invalid encoded data")
-        
-        return ''.join(decoded_data)
 
 def huffman_encode(data):
     """
@@ -195,3 +147,51 @@ def huffman_encode(data):
     """
     codec = HuffmanCodec(data)
     return codec.encode()
+
+def huffman_decode(encoded_data, huffman_tree):
+    """
+    Decode Huffman encoded data.
+    
+    Args:
+        encoded_data (str): Encoded binary string
+        huffman_tree (HuffmanNode): Huffman tree used for encoding
+    
+    Returns:
+        str: Decoded original data
+    
+    Raises:
+        ValueError: If encoded data or Huffman tree is invalid
+    """
+    # Handle None cases
+    if huffman_tree is None:
+        raise ValueError("Huffman tree cannot be None")
+    
+    # Empty input
+    if not encoded_data:
+        return ""
+    
+    # Special case for single character
+    if hasattr(huffman_tree, 'left') and huffman_tree.left and huffman_tree.left.char is not None:
+        return huffman_tree.left.char * (len(encoded_data) // len('0'))
+    
+    decoded_data = []
+    current_node = huffman_tree
+    
+    try:
+        for bit in encoded_data:
+            # Traverse down the tree based on the bit
+            current_node = current_node.left if bit == '0' else current_node.right
+            
+            # If we've reached a leaf node, we've found a character
+            if current_node.char is not None:
+                decoded_data.append(current_node.char)
+                # Reset to root for next character
+                current_node = huffman_tree
+    except AttributeError:
+        raise ValueError("Invalid Huffman tree or encoded data")
+    
+    # Ensure we've decoded the entire encoded data
+    if current_node != huffman_tree:
+        raise ValueError("Invalid encoded data")
+    
+    return ''.join(decoded_data)
