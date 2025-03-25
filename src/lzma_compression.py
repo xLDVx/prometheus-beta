@@ -1,4 +1,4 @@
-import lzmaffi
+import lzma
 import io
 
 def lzma_compress(data):
@@ -28,16 +28,9 @@ def lzma_compress(data):
     if not isinstance(data, bytes):
         raise TypeError("Input must be bytes or str")
 
-    # Create a buffer to store compressed data
-    compressed_data = io.BytesIO()
-    
     try:
         # Compress the data
-        with lzmaffi.open(compressed_data, 'wb', format=lzmaffi.FORMAT_ALONE) as lzma_file:
-            lzma_file.write(data)
-        
-        # Return compressed bytes
-        return compressed_data.getvalue()
+        return lzma.compress(data, preset=9)
     
     except Exception as e:
         raise RuntimeError(f"LZMA compression failed: {str(e)}")
@@ -66,8 +59,7 @@ def lzma_decompress(compressed_data):
 
     try:
         # Decompress the data
-        with lzmaffi.open(io.BytesIO(compressed_data), 'rb', format=lzmaffi.FORMAT_ALONE) as lzma_file:
-            return lzma_file.read()
+        return lzma.decompress(compressed_data)
     
     except Exception as e:
         raise RuntimeError(f"LZMA decompression failed: {str(e)}")
