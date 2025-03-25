@@ -8,8 +8,8 @@ def find_duplicates(numbers: List[int]) -> List[int]:
         numbers (List[int]): A list of integers to check for duplicates.
 
     Returns:
-        List[int]: A list of integers that appear more than once in the input list.
-                   Duplicates are returned only once, in the order of their first appearance.
+        List[int]: A list of unique integers that appear more than once in the input list.
+                   Duplicates are returned only once, preserving their first appearance order.
 
     Examples:
         >>> find_duplicates([1, 2, 3, 4, 2, 5, 6, 3])
@@ -23,12 +23,15 @@ def find_duplicates(numbers: List[int]) -> List[int]:
     seen = set()
     duplicates = set()
 
+    # Use a list to preserve the order of first duplicate appearances
+    result = []
+
     for num in numbers:
-        # If the number is already in seen, it's a duplicate
-        if num in seen:
+        # If the number is already in seen, add it to duplicates if not already there
+        if num in seen and num not in duplicates:
+            result.append(num)
             duplicates.add(num)
         else:
             seen.add(num)
 
-    # Convert duplicates to a list, preserving the order of first appearance
-    return [num for num in numbers if num in duplicates]
+    return result
