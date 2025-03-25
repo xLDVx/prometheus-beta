@@ -18,21 +18,20 @@ def search_matrix(matrix, target):
         ValueError: If matrix is empty or contains non-integer elements.
     """
     # Input validation
-    if not matrix or not isinstance(matrix, list):
-        return False
-    
-    if not all(isinstance(row, list) for row in matrix):
+    if not isinstance(matrix, list):
         raise TypeError("Matrix must be a list of lists")
     
     if not isinstance(target, int):
         raise TypeError("Target must be an integer")
     
     # Check if matrix is empty
-    if len(matrix) == 0 or len(matrix[0]) == 0:
+    if len(matrix) == 0 or (len(matrix) > 0 and len(matrix[0]) == 0):
         return False
     
     # Validate matrix contents
     for row in matrix:
+        if not isinstance(row, list):
+            raise TypeError("Matrix must be a list of lists")
         if not all(isinstance(x, int) for x in row):
             raise ValueError("Matrix must contain only integers")
     
