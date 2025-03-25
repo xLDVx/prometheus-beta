@@ -27,27 +27,22 @@ def bead_sort(arr):
     if len(arr) <= 1:
         return arr.copy()
     
-    # Find the maximum number to determine the number of rods needed
+    # Initialize the sorting space
     max_num = max(arr)
     
-    # Create the initial bead configuration
-    beads = []
-    for num in arr:
-        # Create beads for each number
-        rod = [1] * num
-        beads.append(rod)
+    # Create a 2D grid representing the beads
+    grid = [[1 if j < num else 0 for j in range(max_num)] for num in arr]
     
-    # Simulate gravity (dropping beads)
+    # Simulate gravity by dropping beads
     for col in range(max_num):
-        # Count beads in each column
-        col_count = sum(1 for rod in beads if len(rod) > col)
+        # Count total beads in this column
+        col_sum = sum(row[col] for row in grid)
         
-        # Drop beads
-        for i in range(len(beads)):
-            if len(beads[i]) > col:
-                beads[i] = [1] * col_count + [0] * (len(beads[i]) - col_count)
+        # Drop beads down
+        for row in grid:
+            row[col] = 1 if col < col_sum else 0
     
     # Reconstruct the sorted array
-    sorted_arr = [len(rod) for rod in beads]
+    sorted_arr = [sum(row) for row in grid]
     
     return sorted_arr
