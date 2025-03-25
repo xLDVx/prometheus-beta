@@ -31,5 +31,5 @@ def test_complex_frequency_sorting():
 def test_negative_numbers():
     """Test sorting with negative numbers"""
     input_list = [-1, -1, 2, 2, 2, 3, 3]
-    expected = [3, -1, -1, 2, 2, 2]
+    expected = [-1, -1, 3, 3, 2, 2, 2]
     assert sort_by_frequency(input_list) == expected
