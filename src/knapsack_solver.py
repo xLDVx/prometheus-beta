@@ -58,14 +58,14 @@ def solve_knapsack(items, max_weight):
                     dp[i-1][w-weight] + value  # include item
                 )
     
-    # Backtrack to find selected items (optimized to prefer lower-indexed items)
+    # Backtrack to find selected items
     selected_items = []
     w = max_weight
     
-    # Find the combination with the optimal value
+    # Find the combination with the specified value
     for i in range(n, 0, -1):
         if w >= 0 and dp[i][w] != dp[i-1][w]:
-            # This item was included in the optimal solution
+            # This item was included
             selected_items.append(i-1)
             w -= int(items[i-1][0])
     
