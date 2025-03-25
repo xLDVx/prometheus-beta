@@ -32,16 +32,27 @@ def convert_to_alternating_dot_case(input_string):
     
     # Convert to alternating dot case
     result = []
-    for i, char in enumerate(input_string.lower()):
-        # Even indices (0, 2, 4...) are lowercase
-        # Odd indices (1, 3, 5...) are uppercase
-        if i % 2 == 0:
-            result.append(char)
-        else:
-            result.append(char.upper())
+    is_letter_sequence = False
+    for i, char in enumerate(input_string):
+        # Determine if the current character is a letter
+        is_current_letter = char.isalpha()
         
-        # Add dot between characters, but not after the last character
-        if i < len(input_string) - 1:
+        # Start or continue letter sequence
+        if is_current_letter:
+            # For letters, apply alternating case
+            if not is_letter_sequence or i % 2 == 0:
+                char = char.lower()
+            else:
+                char = char.upper()
+            is_letter_sequence = True
+        else:
+            # Reset letter sequence for non-letter characters
+            is_letter_sequence = False
+        
+        # If not the first character, add a dot
+        if i > 0:
             result.append('.')
+        
+        result.append(char)
     
     return ''.join(result)
