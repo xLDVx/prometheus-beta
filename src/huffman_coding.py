@@ -43,6 +43,14 @@ def build_huffman_tree(freq_dict):
     if not freq_dict:
         raise ValueError("Frequency dictionary cannot be empty")
     
+    # Special case for single character
+    if len(freq_dict) == 1:
+        char, freq = list(freq_dict.items())[0]
+        root = HuffmanNode(char, freq)
+        # If single character, add a dummy node to allow decoding
+        root.left = HuffmanNode(None, 1)
+        return root
+    
     # Create priority queue of nodes
     heap = [HuffmanNode(char, freq) for char, freq in freq_dict.items()]
     heapq.heapify(heap)
@@ -83,7 +91,8 @@ def build_huffman_codes(root):
         
         # Leaf node (has a character)
         if node.char is not None:
-            codes[node.char] = current_code
+            # Special case for single character 
+            codes[node.char] = current_code if current_code else '0'
             return
         
         # Traverse left with '0'
@@ -113,6 +122,10 @@ def huffman_encode(data):
     if not data:
         raise ValueError("Input data cannot be empty")
     
+    # Handle single character case
+    if len(set(data)) == 1:
+        return '0' * len(data), build_huffman_tree({data[0]: len(data)})
+    
     # Build frequency dictionary
     freq_dict = build_frequency_dict(data)
     
@@ -141,8 +154,20 @@ def huffman_decode(encoded_data, huffman_tree):
     Raises:
         ValueError: If encoded data or Huffman tree is invalid
     """
-    if not encoded_data or not huffman_tree:
-        raise ValueError("Encoded data and Huffman tree must be valid")
+    if not encoded_data and len(encoded_data) == 0:
+        if huffman_tree.char is not None:
+            # Single character repetition case
+            return huffman_tree.char * len(encoded_data)
+        else:
+            raise ValueError("Encoded data and Huffman tree must be valid")
+    
+    if not huffman_tree:
+        raise ValueError("Huffman tree is invalid")
+    
+    # Special case for single character
+    if huffman_tree.left and huffman_tree.left.char is not None and not huffman_tree.right:
+        # If tree represents single repeated character
+        return huffman_tree.left.char * (len(encoded_data) // len('0'))
     
     decoded_data = []
     current_node = huffman_tree
