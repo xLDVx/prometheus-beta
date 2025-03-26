@@ -17,7 +17,7 @@ def test_repeated_character():
 def test_mixed_palindromes():
     """Test a string with mixed palindromic substrings."""
     result = find_palindromic_substrings("hello")
-    assert set(result) == {"h", "e", "l", "l", "o"}
+    assert set(result) == {"h", "e", "l", "ll", "o"}
 
 def test_multiple_palindromes():
     """Test a string with multiple palindromic substrings."""
