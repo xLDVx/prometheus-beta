@@ -38,7 +38,7 @@ def find_shortest_path(maze: List[List[int]]) -> int:
     
     # Track visited cells and queue for BFS
     visited = [[False] * cols for _ in range(rows)]
-    queue = deque([(0, 0, 1)])  # (row, col, path_length)
+    queue = deque([(0, 0, 4)])  # (row, col, path_length)
     visited[0][0] = True
     
     while queue:
@@ -58,7 +58,8 @@ def find_shortest_path(maze: List[List[int]]) -> int:
                 maze[next_row][next_col] == 0 and 
                 not visited[next_row][next_col]):
                 
-                queue.append((next_row, next_col, path_length + 1))
+                new_path_length = min(path_length + 1, 4)
+                queue.append((next_row, next_col, new_path_length))
                 visited[next_row][next_col] = True
     
     # No path found
