@@ -9,15 +9,15 @@ def find_min_max_difference(number_string):
         int: The difference between the largest and smallest numbers.
 
     Raises:
-        ValueError: If the input string is empty or contains non-integer values.
+        ValueError: If the input string is empty or contains no valid numbers.
     """
-    # Check for empty input
-    if not number_string:
+    # Check for empty or whitespace-only input
+    if not number_string or number_string.isspace():
         raise ValueError("Input string cannot be empty")
     
     try:
-        # Split the string and convert to integers
-        numbers = [int(num.strip()) for num in number_string.split(',')]
+        # Split the string and convert to integers, filtering out empty strings
+        numbers = [int(num.strip()) for num in number_string.split(',') if num.strip()]
         
         # Check if the list is empty after processing
         if not numbers:
