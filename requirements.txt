@@ -1,1 +1,2 @@
 pytest
+# Existing dependencies can be added below if any
