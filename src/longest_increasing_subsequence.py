@@ -39,6 +39,7 @@ def find_longest_increasing_subsequence(arr):
     
     for i in range(1, n):
         for j in range(i):
+            # Use <= to allow only strictly increasing subsequence
             if arr[i] > arr[j] and dp[i] < dp[j] + 1:
                 dp[i] = dp[j] + 1
                 prev[i] = j
