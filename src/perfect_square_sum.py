@@ -39,13 +39,4 @@ def sum_perfect_squares_from_set(num_set: Set[int]) -> int:
         if root * root == num:
             perfect_squares.add(num)
     
-    # Combine each unique pair of numbers to find additional perfect squares
-    for base in num_set:
-        for other in num_set:
-            square = base * other
-            root = int(math.sqrt(square))
-            if root * root == square and 0 < square <= max(num_set)*max(num_set):
-                perfect_squares.add(square)
-    
-    # Return sum of unique perfect squares
     return sum(perfect_squares)
