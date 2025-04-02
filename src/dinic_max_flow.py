@@ -22,7 +22,7 @@ class DinicMaxFlow:
         """
         self.num_vertices = num_vertices
         self.graph = [[] for _ in range(num_vertices)]
-        self.capacity = [[0] * num_vertices for _ in range(num_vertices)]
+        self.residual_graph = [[0] * num_vertices for _ in range(num_vertices)]
     
     def add_edge(self, u: int, v: int, capacity: int):
         """
@@ -34,9 +34,12 @@ class DinicMaxFlow:
             capacity (int): Edge capacity
         """
         # Check if edge already exists
-        self.graph[u].append(v)
-        self.graph[v].append(u)
-        self.capacity[u][v] += capacity
+        if v not in self.graph[u]:
+            self.graph[u].append(v)
+            self.graph[v].append(u)
+        
+        # Combine capacities for multiple edges
+        self.residual_graph[u][v] += capacity
     
     def _bfs(self, source: int, sink: int) -> List[int]:
         """
@@ -60,14 +63,13 @@ class DinicMaxFlow:
             
             for v in self.graph[u]:
                 # If not visited and residual capacity exists
-                if level[v] == -1 and self.capacity[u][v] > 0:
+                if level[v] == -1 and self.residual_graph[u][v] > 0:
                     level[v] = level[u] + 1
                     queue.append(v)
         
         return level
     
-    def _dfs(self, u: int, sink: int, flow: int, level: List[int], 
-             flow_so_far: int) -> int:
+    def _dfs(self, u: int, sink: int, flow: int, level: List[int]) -> int:
         """
         Depth-first search to find augmenting paths.
         
@@ -76,7 +78,6 @@ class DinicMaxFlow:
             sink (int): Sink vertex
             flow (int): Current possible flow
             level (List[int]): Level of each vertex
-            flow_so_far (int): Flow accumulated so far
         
         Returns:
             int: Augmented flow
@@ -88,14 +89,14 @@ class DinicMaxFlow:
         for v in self.graph[u]:
             # Check if this path has residual capacity and is a valid level path
             if (level[v] == level[u] + 1 and 
-                self.capacity[u][v] > 0):
+                self.residual_graph[u][v] > 0):
                 
-                curr_flow = min(flow, self.capacity[u][v])
-                path_flow = self._dfs(v, sink, curr_flow, level, flow_so_far + curr_flow)
+                curr_flow = min(flow, self.residual_graph[u][v])
+                path_flow = self._dfs(v, sink, curr_flow, level)
                 
                 if path_flow > 0:
-                    self.capacity[u][v] -= path_flow
-                    self.capacity[v][u] += path_flow
+                    self.residual_graph[u][v] -= path_flow
+                    self.residual_graph[v][u] += path_flow
                     return path_flow
         
         return 0
@@ -117,6 +118,11 @@ class DinicMaxFlow:
            source == sink:
             raise ValueError("Invalid source or sink vertex")
         
+        # Initialize residual graph
+        for i in range(self.num_vertices):
+            for j in range(self.num_vertices):
+                self.residual_graph[i][j] = self.residual_graph[i][j]
+        
         max_flow = 0
         
         # Keep finding augmenting paths
@@ -127,9 +133,9 @@ class DinicMaxFlow:
             if level[sink] == -1:
                 break
             
-            # Keep finding paths until no more augmenting paths
+            # Keep finding augmenting paths
             while True:
-                path_flow = self._dfs(source, sink, float('inf'), level, 0)
+                path_flow = self._dfs(source, sink, float('inf'), level)
                 
                 if path_flow == 0:
                     break
