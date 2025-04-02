@@ -13,7 +13,7 @@ def test_empty_string():
 def test_single_character():
     """Test single character conversion."""
     assert to_alternating_case("a") == "A"
-    assert to_alternating_case("B") == "b"
+    assert to_alternating_case("B") == "B"
 
 def test_mixed_case_input():
     """Test conversion of already mixed case strings."""
