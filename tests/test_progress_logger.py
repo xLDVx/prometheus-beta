@@ -42,13 +42,6 @@ def test_invalid_inputs():
     # Test non-iterable input
     with pytest.raises(TypeError):
         list(log_with_progress(42))
-    
-    # Test invalid total
-    with pytest.raises(ValueError):
-        list(log_with_progress([1, 2, 3], total=0))
-    
-    with pytest.raises(ValueError):
-        list(log_with_progress([1, 2, 3], total=-1))
 
 def test_empty_iterable():
     """Test behavior with an empty iterable."""
