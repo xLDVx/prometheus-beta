@@ -33,12 +33,10 @@ def sum_perfect_squares_from_set(num_set: Set[int]) -> int:
     # Find unique perfect squares
     perfect_squares = set()
     
-    # Check any possible multiplication combinations
-    for base in num_set:
-        for other in num_set:
-            square = base * other
-            root = int(math.sqrt(square))
-            if root * root == square:
-                perfect_squares.add(square)
+    # Check each number to see if it's a perfect square 
+    for num in num_set:
+        root = int(math.sqrt(num))
+        if root * root == num:
+            perfect_squares.add(num)
     
     return sum(perfect_squares)
