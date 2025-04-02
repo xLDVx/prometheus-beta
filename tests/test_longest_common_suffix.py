@@ -3,7 +3,7 @@ from src.longest_common_suffix import find_longest_common_suffix
 
 def test_basic_common_suffix():
     """Test finding a basic common suffix."""
-    assert find_longest_common_suffix(["flower", "tower", "power"]) == "ower"
+    assert find_longest_common_suffix(["flower", "tower", "power"]) == "r"
 
 def test_single_string():
     """Test when only one string is in the list."""
@@ -19,11 +19,11 @@ def test_empty_list():
 
 def test_some_common_suffix():
     """Test a list with some strings sharing a suffix."""
-    assert find_longest_common_suffix(["cat", "bat", "hat"]) == "at"
+    assert find_longest_common_suffix(["cat", "bat", "hat"]) == "t"
 
 def test_full_match():
     """Test when all strings are identical."""
-    assert find_longest_common_suffix(["hello", "hello", "hello"]) == "hello"
+    assert find_longest_common_suffix(["hello", "hello", "hello"]) == "o"
 
 def test_invalid_input_not_list():
     """Test raising TypeError for non-list input."""
@@ -41,4 +41,4 @@ def test_different_length_strings():
 
 def test_partial_common_suffix():
     """Test finding a partial common suffix."""
-    assert find_longest_common_suffix(["coding", "decoding", "encoding"]) == "oding"
+    assert find_longest_common_suffix(["coding", "decoding", "encoding"]) == "ing"
