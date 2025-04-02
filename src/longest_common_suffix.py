@@ -24,20 +24,21 @@ def find_longest_common_suffix(strings):
     if not all(isinstance(s, str) for s in strings):
         raise TypeError("All elements must be strings")
     
-    # Handle case with single string
+    # Handle case with single string (full string is the "suffix")
     if len(strings) == 1:
-        return strings[0][-1] if strings[0] else ""
+        return strings[0]
     
-    # Initialize with last character of the shortest string
+    # Find the shortest string to limit suffix length
     shortest = min(strings, key=len)
-    if not shortest:
-        return ""
     
-    # Find the longest match looking from the end
-    common_suffix = shortest[-1]
+    # Start from the longest possible suffix and work down
+    for length in range(len(shortest), 0, -1):
+        # Get the potential suffix
+        potential_suffix = shortest[-length:]
+        
+        # Check if this suffix is common to all strings
+        if all(s.endswith(potential_suffix) for s in strings):
+            return potential_suffix
     
-    # Check if this is a valid suffix for all strings
-    if not all(s.endswith(common_suffix) for s in strings):
-        return ""
-    
-    return common_suffix
+    # If no common suffix found
+    return ""
