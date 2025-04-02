@@ -33,6 +33,20 @@ def test_disconnected_graph():
 def test_complex_flow_network():
     """
     Test a more complex flow network
+    
+    Network structure:
+    0 --> 1 (10)
+    0 --> 2 (10)
+    1 --> 3 (4)
+    1 --> 4 (8)
+    2 --> 4 (9)
+    3 --> 5 (10)
+    4 --> 5 (10)
+    
+    Manually calculated max flow paths:
+    0 -> 1 -> 3 -> 5 (4)
+    0 -> 1 -> 4 -> 5 (8)
+    0 -> 2 -> 4 -> 5 (7)
     """
     dinic = DinicMaxFlow(6)
     dinic.add_edge(0, 1, 10)
@@ -44,6 +58,7 @@ def test_complex_flow_network():
     dinic.add_edge(4, 5, 10)
     
     max_flow = dinic.max_flow(0, 5)
+    print(f"Actual max flow: {max_flow}")
     assert max_flow == 19, f"Expected max flow of 19, got {max_flow}"
 
 def test_invalid_source_sink():
