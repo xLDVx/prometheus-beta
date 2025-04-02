@@ -2,6 +2,9 @@ def to_alternating_case(text: str) -> str:
     """
     Convert a string to alternating case (AkA AlTeRnAtInG cAsE).
     
+    The first character (index 0) is always converted to uppercase,
+    with subsequent characters alternating to lowercase.
+    
     Args:
         text (str): The input string to be converted.
     
