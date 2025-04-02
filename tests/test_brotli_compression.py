@@ -41,15 +41,17 @@ def test_compression_modes():
     """Test different compression modes"""
     text = "This is a test text for different Brotli modes."
     
-    # Test different modes
-    generic_mode = compress_brotli(text, mode=brotli.MODE_GENERIC)
-    text_mode = compress_brotli(text, mode=brotli.MODE_TEXT)
-    font_mode = compress_brotli(text, mode=brotli.MODE_FONT)
+    # Verify different modes can compress the same input differently
+    def compression_diff_by_mode(first_mode, second_mode):
+        """Helper function to check if compressions differ"""
+        first_compressed = compress_brotli(text, mode=first_mode)
+        second_compressed = compress_brotli(text, mode=second_mode)
+        return first_compressed != second_compressed
     
-    # Ensure compressions are different
-    assert generic_mode != text_mode
-    assert text_mode != font_mode
-    assert generic_mode != font_mode
+    # Test different mode combinations
+    assert compression_diff_by_mode(brotli.MODE_GENERIC, brotli.MODE_TEXT)
+    assert compression_diff_by_mode(brotli.MODE_GENERIC, brotli.MODE_FONT)
+    assert compression_diff_by_mode(brotli.MODE_TEXT, brotli.MODE_FONT)
 
 def test_invalid_input_types():
     """Test error handling for invalid input types"""
