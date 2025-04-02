@@ -22,7 +22,6 @@ def log_with_progress(
 
     Raises:
         TypeError: If items is not iterable
-        ValueError: If total is less than or equal to 0 when specified
     """
     # Validate inputs
     if not hasattr(items, '__iter__'):
@@ -34,10 +33,6 @@ def log_with_progress(
             total = len(items)
         except TypeError:
             total = None
-    
-    # Validate total if specified
-    if total is not None and total <= 0:
-        raise ValueError("Total must be a positive integer")
     
     # Use specified output or default to stderr
     output = output or sys.stderr
