@@ -1,7 +1,7 @@
 import brotli
-from typing import Union, Optional
+from typing import Union
 
-def compress_brotli(data: Union[str, bytes], quality: int = 11) -> bytes:
+def compress_brotli(data: Union[str, bytes], quality: int = 11, mode: int = brotli.MODE_GENERIC) -> bytes:
     """
     Compress data using Brotli compression algorithm.
 
@@ -10,6 +10,9 @@ def compress_brotli(data: Union[str, bytes], quality: int = 11) -> bytes:
                Can be a string or bytes object.
         quality (int, optional): Compression level from 0-11. 
                Defaults to 11 (highest compression).
+        mode (int, optional): Compression mode. 
+               Defaults to brotli.MODE_GENERIC.
+               Can be MODE_GENERIC, MODE_TEXT, or MODE_FONT.
 
     Returns:
         bytes: Compressed data in Brotli format.
@@ -30,9 +33,13 @@ def compress_brotli(data: Union[str, bytes], quality: int = 11) -> bytes:
     if not 0 <= quality <= 11:
         raise ValueError("Compression quality must be between 0 and 11")
     
+    # Validate mode 
+    if mode not in [brotli.MODE_GENERIC, brotli.MODE_TEXT, brotli.MODE_FONT]:
+        raise ValueError("Invalid Brotli compression mode")
+    
     # Perform Brotli compression
     try:
-        compressed_data = brotli.compress(data, quality)
+        compressed_data = brotli.compress(data, mode=mode, quality=quality)
         return compressed_data
     except Exception as e:
         raise RuntimeError(f"Compression failed: {str(e)}")
