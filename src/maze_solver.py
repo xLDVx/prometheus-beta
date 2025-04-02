@@ -17,7 +17,7 @@ def find_shortest_path(maze: List[List[int]]) -> Optional[List[Tuple[int, int]]]
         or None if no path exists
     
     Raises:
-        ValueError: If maze is empty or invalid
+        ValueError: If maze is empty, invalid, or has multiple start/end cells
     """
     # Validate input
     if not maze or not maze[0]:
@@ -26,15 +26,19 @@ def find_shortest_path(maze: List[List[int]]) -> Optional[List[Tuple[int, int]]]
     # Find start and end cells
     start = None
     end = None
+    start_count = 0
+    end_count = 0
     for r, row in enumerate(maze):
         for c, cell in enumerate(row):
             if cell == 2:
                 start = (r, c)
+                start_count += 1
             elif cell == 3:
                 end = (r, c)
+                end_count += 1
     
-    # Validate start and end exist
-    if start is None or end is None:
+    # Validate unique start and end
+    if start_count != 1 or end_count != 1:
         raise ValueError("Maze must contain exactly one start (2) and one end (3) cell")
     
     # BFS to find shortest path
