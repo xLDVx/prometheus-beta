@@ -1,6 +1,7 @@
 import pytest
 import sys
 import os
+import brotli
 
 # Add the src directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
@@ -36,6 +37,20 @@ def test_compression_quality():
     # High quality should generally result in smaller compressed size
     assert len(compressed_high) <= len(compressed_low)
 
+def test_compression_modes():
+    """Test different compression modes"""
+    text = "This is a test text for different Brotli modes."
+    
+    # Test different modes
+    generic_mode = compress_brotli(text, mode=brotli.MODE_GENERIC)
+    text_mode = compress_brotli(text, mode=brotli.MODE_TEXT)
+    font_mode = compress_brotli(text, mode=brotli.MODE_FONT)
+    
+    # Ensure compressions are different
+    assert generic_mode != text_mode
+    assert text_mode != font_mode
+    assert generic_mode != font_mode
+
 def test_invalid_input_types():
     """Test error handling for invalid input types"""
     with pytest.raises(TypeError):
@@ -51,6 +66,11 @@ def test_invalid_compression_quality():
     
     with pytest.raises(ValueError):
         compress_brotli("test", quality=12)
+
+def test_invalid_compression_mode():
+    """Test error handling for invalid compression mode"""
+    with pytest.raises(ValueError):
+        compress_brotli("test", mode=999)
 
 def test_empty_input():
     """Test compression and decompression of empty input"""
@@ -71,3 +91,8 @@ def test_large_input():
     decompressed = decompress_brotli(compressed)
     
     assert decompressed.decode('utf-8') == large_text
+
+def test_decompression_corrupted_data():
+    """Test decompression of corrupted data"""
+    with pytest.raises(RuntimeError):
+        decompress_brotli(b'corrupted_data')
