@@ -26,19 +26,18 @@ def find_longest_common_suffix(strings):
     
     # Handle case with single string
     if len(strings) == 1:
-        return strings[0]
+        return strings[0][-1] if strings[0] else ""
     
-    # Find the shortest string to limit suffix length
+    # Initialize with last character of the shortest string
     shortest = min(strings, key=len)
+    if not shortest:
+        return ""
     
-    # Start from the longest possible suffix and work down
-    for length in range(len(shortest), 0, -1):
-        # Get the potential suffix
-        potential_suffix = shortest[-length:]
-        
-        # Check if this suffix is common to all strings
-        if all(s.endswith(potential_suffix) for s in strings):
-            return potential_suffix
+    # Find the longest match looking from the end
+    common_suffix = shortest[-1]
     
-    # If no common suffix found
-    return ""
+    # Check if this is a valid suffix for all strings
+    if not all(s.endswith(common_suffix) for s in strings):
+        return ""
+    
+    return common_suffix
