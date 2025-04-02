@@ -22,7 +22,7 @@ class DinicMaxFlow:
         """
         self.num_vertices = num_vertices
         self.graph = [[] for _ in range(num_vertices)]
-        self.residual_graph = [[0] * num_vertices for _ in range(num_vertices)]
+        self.capacity = [[0] * num_vertices for _ in range(num_vertices)]
     
     def add_edge(self, u: int, v: int, capacity: int):
         """
@@ -33,13 +33,10 @@ class DinicMaxFlow:
             v (int): Destination vertex
             capacity (int): Edge capacity
         """
-        # Check if edge already exists
-        if v not in self.graph[u]:
-            self.graph[u].append(v)
-            self.graph[v].append(u)
-        
-        # Combine capacities for multiple edges
-        self.residual_graph[u][v] += capacity
+        # Eliminate duplicate edges by summing capacities
+        self.graph[u].append(v)
+        self.graph[v].append(u)
+        self.capacity[u][v] += capacity
     
     def _bfs(self, source: int, sink: int) -> List[int]:
         """
@@ -52,7 +49,6 @@ class DinicMaxFlow:
         Returns:
             List[int]: Level of each vertex
         """
-        # Reset levels
         level = [-1] * self.num_vertices
         level[source] = 0
         
@@ -63,7 +59,7 @@ class DinicMaxFlow:
             
             for v in self.graph[u]:
                 # If not visited and residual capacity exists
-                if level[v] == -1 and self.residual_graph[u][v] > 0:
+                if level[v] == -1 and self.capacity[u][v] > 0:
                     level[v] = level[u] + 1
                     queue.append(v)
         
@@ -87,16 +83,16 @@ class DinicMaxFlow:
             return flow
         
         for v in self.graph[u]:
-            # Check if this path has residual capacity and is a valid level path
+            # Check if this path is valid in the level graph
             if (level[v] == level[u] + 1 and 
-                self.residual_graph[u][v] > 0):
+                self.capacity[u][v] > 0):
                 
-                curr_flow = min(flow, self.residual_graph[u][v])
+                curr_flow = min(flow, self.capacity[u][v])
                 path_flow = self._dfs(v, sink, curr_flow, level)
                 
                 if path_flow > 0:
-                    self.residual_graph[u][v] -= path_flow
-                    self.residual_graph[v][u] += path_flow
+                    self.capacity[u][v] -= path_flow
+                    self.capacity[v][u] += path_flow
                     return path_flow
         
         return 0
@@ -118,22 +114,21 @@ class DinicMaxFlow:
            source == sink:
             raise ValueError("Invalid source or sink vertex")
         
-        # Initialize residual graph
-        for i in range(self.num_vertices):
-            for j in range(self.num_vertices):
-                self.residual_graph[i][j] = self.residual_graph[i][j]
+        # Create a copy of the original capacity
+        original_capacity = [row[:] for row in self.capacity]
         
         max_flow = 0
         
-        # Keep finding augmenting paths
+        # Dinic algorithm
         while True:
+            # Build level graph using BFS
             level = self._bfs(source, sink)
             
-            # If no path exists, we're done
+            # No path exists from source to sink
             if level[sink] == -1:
                 break
             
-            # Keep finding augmenting paths
+            # Find blocking flow
             while True:
                 path_flow = self._dfs(source, sink, float('inf'), level)
                 
@@ -141,5 +136,8 @@ class DinicMaxFlow:
                     break
                 
                 max_flow += path_flow
+        
+        # Restore original capacity
+        self.capacity = original_capacity
         
         return max_flow
