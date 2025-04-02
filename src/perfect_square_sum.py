@@ -30,7 +30,7 @@ def sum_perfect_squares_from_set(num_set: Set[int]) -> int:
     if any(not isinstance(x, int) or x < 0 for x in num_set):
         raise TypeError("Set must contain only non-negative integers")
     
-    # Find unique perfect squares
+    # Find unique perfect squares that can be formed from the set
     perfect_squares = set()
     for base in num_set:
         # Check if base itself is a perfect square
@@ -38,7 +38,7 @@ def sum_perfect_squares_from_set(num_set: Set[int]) -> int:
         if root * root == base:
             perfect_squares.add(base)
         
-        # Check for perfect squares using elements in the set
+        # Check for perfect squares formed by multiplying elements
         for other in num_set:
             square = base * other
             root = int(math.sqrt(square))
