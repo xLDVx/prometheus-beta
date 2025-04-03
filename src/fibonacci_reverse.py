@@ -1,0 +1,34 @@
+def fibonacci_reverse(n):
+    """
+    Generate a Fibonacci sequence up to the Nth element and return it in reverse order.
+    
+    Args:
+        n (int): The number of Fibonacci elements to generate.
+    
+    Returns:
+        list: A list of Fibonacci numbers in reverse order.
+    
+    Raises:
+        ValueError: If the input is negative.
+        TypeError: If the input is not an integer.
+    """
+    # Validate input
+    if not isinstance(n, int):
+        raise TypeError("Input must be an integer")
+    
+    if n < 0:
+        raise ValueError("Input must be a non-negative integer")
+    
+    # Special cases for 0 and 1
+    if n == 0:
+        return []
+    if n == 1:
+        return [0]
+    
+    # Generate Fibonacci sequence
+    fib_sequence = [0, 1]
+    while len(fib_sequence) < n:
+        fib_sequence.append(fib_sequence[-1] + fib_sequence[-2])
+    
+    # Return sequence up to nth element in reverse order
+    return list(reversed(fib_sequence[:n]))
