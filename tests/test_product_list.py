@@ -43,8 +43,8 @@ def test_non_numeric_elements():
 
 def test_large_numbers():
     """Test functionality with larger numbers."""
-    assert product_of_others([10, 20, 30]) == [6000, 3000, 2000]
+    assert product_of_others([10, 20, 30]) == [600, 300, 200]
 
 def test_negative_numbers():
     """Test functionality with negative numbers."""
-    assert product_of_others([-1, 2, -3]) == [-6, 3, 2]
+    assert product_of_others([-1, 2, -3]) == [-6, 3, -2]
