@@ -40,8 +40,14 @@ class MallMap:
             self.stores[store2] = {}
         
         # Add bidirectional connection
-        self.stores[store1][store2] = distance
-        self.stores[store2][store1] = distance
+        self.stores[store1][store2] = min(
+            distance, 
+            self.stores[store1].get(store2, float('inf'))
+        )
+        self.stores[store2][store1] = min(
+            distance, 
+            self.stores[store2].get(store1, float('inf'))
+        )
     
     def find_shortest_path(self, start: str, end: str) -> Optional[List[str]]:
         """
@@ -56,7 +62,7 @@ class MallMap:
             or None if no path exists
         
         Raises:
-            ValueError: If start or end store does not exist in the map
+            ValueError: If start store does not exist in the map
         """
         # Validate inputs
         if start not in self.stores:
