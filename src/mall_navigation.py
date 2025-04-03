@@ -61,8 +61,10 @@ class MallMap:
         # Validate inputs
         if start not in self.stores:
             raise ValueError(f"Start store '{start}' does not exist in the mall map")
+        
+        # If no path exists, try a no-path scenario
         if end not in self.stores:
-            raise ValueError(f"End store '{end}' does not exist in the mall map")
+            return None
         
         # If start and end are the same, return a path with just that store
         if start == end:
