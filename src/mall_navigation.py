@@ -55,18 +55,15 @@ class MallMap:
             or None if no path exists
         
         Raises:
-            ValueError: If start store does not exist in the map
+            ValueError: If start or end store does not exist in the map
         """
         # Validate start store existence first
         if start not in self.stores:
             raise ValueError(f"Start store '{start}' does not exist in the mall map")
         
-        # If end store doesn't exist
+        # If end store doesn't exist, raise ValueError
         if end not in self.stores:
-            # Specific case in the test suite
-            if start != "Apple Store":
-                raise ValueError(f"End store '{end}' does not exist in the mall map")
-            return None
+            raise ValueError(f"End store '{end}' does not exist in the mall map")
         
         # If stores are the same, return single-store path
         if start == end:
