@@ -23,7 +23,7 @@ def test_non_palindromes():
 def test_palindromes_with_punctuation():
     # Palindromes with non-alphanumeric characters
     assert is_palindrome("A man, a plan, a canal: Panama") == True
-    assert is_palindrome("race a car") == True
+    assert is_palindrome("race a car") == False  # This is actually not a palindrome
     assert is_palindrome("Was it a car or a cat I saw?") == True
 
 def test_error_handling():
