@@ -30,5 +30,5 @@ def fibonacci_reverse(n):
     while len(fib_sequence) < n:
         fib_sequence.append(fib_sequence[-1] + fib_sequence[-2])
     
-    # Return sequence up to nth element in reverse order
+    # Use slice to handle potentially overgenerated sequences
     return list(reversed(fib_sequence[:n]))
