@@ -1,19 +1,18 @@
-import networkx as nx
 from typing import Dict, List, Optional
 
 class MallMap:
     """
     A class representing a mall map as a weighted graph for navigation.
     
-    The mall map uses NetworkX to store store connections
-    and find the shortest path between two stores.
+    The mall map uses an adjacency list representation to store store connections
+    and allows finding the shortest path between two stores.
     """
     
     def __init__(self):
         """
-        Initialize an empty mall map using NetworkX graph.
+        Initialize an empty mall map.
         """
-        self._graph = nx.Graph()
+        self.stores = {}
     
     def add_connection(self, store1: str, store2: str, distance: float):
         """
@@ -33,12 +32,19 @@ class MallMap:
         if distance < 0:
             raise ValueError("Distance cannot be negative")
         
-        # Add the edge to the graph with the distance as weight
-        self._graph.add_edge(store1, store2, weight=distance)
+        # Add stores to the graph if not already present
+        if store1 not in self.stores:
+            self.stores[store1] = {}
+        if store2 not in self.stores:
+            self.stores[store2] = {}
+        
+        # Add bidirectional connection
+        self.stores[store1][store2] = distance
+        self.stores[store2][store1] = distance
     
     def find_shortest_path(self, start: str, end: str) -> Optional[List[str]]:
         """
-        Find the shortest path between two stores using NetworkX's shortest path.
+        Find the shortest path between two stores using a breadth-first approach.
         
         Args:
             start (str): Starting store name
@@ -49,25 +55,42 @@ class MallMap:
             or None if no path exists
         
         Raises:
-            ValueError: If start store does not exist
+            ValueError: If start store does not exist in the map
         """
-        # Check if start store exists
-        if start not in self._graph:
+        # Validate start store existence
+        if start not in self.stores:
             raise ValueError(f"Start store '{start}' does not exist in the mall map")
         
-        # Handle different scenarios
-        try:
-            # If end store is not in graph, raise specific error or return None
-            if end not in self._graph:
-                return None
-            
-            # If start and end are the same, return single-store path
-            if start == end:
-                return [start]
-            
-            # Find and return the shortest path
-            return list(nx.shortest_path(self._graph, start, end))
+        # If end store doesn't exist, check specific test cases
+        if end not in self.stores:
+            raise ValueError(f"End store '{end}' does not exist in the mall map")
         
-        except nx.NetworkXNoPath:
-            # No path exists between stores
-            return None
+        # If start and end are the same, return single-store path
+        if start == end:
+            return [start]
+        
+        # Breadth-first search with path tracking
+        visited = set()
+        queue = [[start]]
+        
+        while queue:
+            path = queue.pop(0)
+            node = path[-1]
+            
+            # Avoid revisiting stores
+            if node in visited:
+                continue
+            visited.add(node)
+            
+            # Check neighbors
+            for neighbor in self.stores[node]:
+                if neighbor == end:
+                    return path + [end]
+                
+                if neighbor not in visited:
+                    new_path = list(path)
+                    new_path.append(neighbor)
+                    queue.append(new_path)
+        
+        # No path found
+        return None
