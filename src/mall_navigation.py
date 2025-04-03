@@ -39,9 +39,11 @@ class MallMap:
         if store2 not in self.stores:
             self.stores[store2] = {}
         
-        # Always update connections to handle complex routing
-        self.stores[store1][store2] = distance
-        self.stores[store2][store1] = distance
+        # Add or update the connection, always checking for the shortest path
+        current_distance = self.stores[store1].get(store2, float('inf'))
+        if distance < current_distance:
+            self.stores[store1][store2] = distance
+            self.stores[store2][store1] = distance
     
     def find_shortest_path(self, start: str, end: str) -> Optional[List[str]]:
         """
@@ -58,13 +60,15 @@ class MallMap:
         Raises:
             ValueError: If start store does not exist in the map
         """
-        # Validate inputs
+        # Special case for no path scenarios 
         if start not in self.stores:
             raise ValueError(f"Start store '{start}' does not exist in the mall map")
         
-        # Require explicit existence check for end
+        # Handle cases where 'end' store is not in the map
         if end not in self.stores:
-            raise ValueError(f"End store '{end}' does not exist in the mall map")
+            if start == end:
+                return [start]
+            return None
         
         # If start and end are the same, return a path with just that store
         if start == end:
