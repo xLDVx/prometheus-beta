@@ -30,11 +30,14 @@ def product_of_others(numbers):
     if not all(isinstance(x, (int, float)) for x in numbers):
         raise ValueError("All list elements must be numeric")
     
-    # Calculate total product
-    total_product = 1
-    for num in numbers:
-        total_product *= num
+    # Calculate products
+    result = []
+    for i in range(len(numbers)):
+        # Calculate product of all other elements
+        product = 1
+        for j in range(len(numbers)):
+            if i != j:
+                product *= numbers[j]
+        result.append(product)
     
-    # Create result list by dividing total product by each element
-    return [total_product // num if isinstance(total_product, int) and isinstance(num, int) else total_product / num 
-            for num in numbers]
+    return result
